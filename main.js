@@ -1,4 +1,4 @@
-﻿import './src/styles.css'
+import './src/styles.css'
 import {
   supabase, registrar, login, getUser, logout, verificarAdmin,
   guardarPrediccionGrupo, getPrediccionesGrupos,
@@ -16,13 +16,13 @@ import { montarTrofeo, montarMedalla, montarMiniBalon } from './src/lib/iconos3d
 import { textoSedes } from './src/lib/sedes.js'
 import { partidoBloqueado, eliminacionBloqueada, textoCierre, formatoFechaPartido } from './src/lib/bloqueos.js'
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  CONFIGURACIÃ“N DEL GRUPO  (cambiar al clonar la app)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
+//  CONFIGURACIÓN DEL GRUPO  (cambiar al clonar la app)
+// ═══════════════════════════════════════════════════════
 const CONDOMINIO = import.meta.env.VITE_NOMBRE_SEDE || 'Condominio Calzadas Coloniales'
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ═══════════════════════════════════════════════════════
 
-// â”€â”€ STATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── STATE ─────────────────────────────────────────────
 let user = null
 let inscripcionesAbiertas = true
 let torneoIniciado = false
@@ -31,7 +31,7 @@ let prediccionesKO = []
 let especiales = null
 let fechasGrupos = {}
 
-// â”€â”€ INIT â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── INIT ──────────────────────────────────────────────
 async function init() {
   user = getUser()
   inscripcionesAbiertas = (await getConfig('inscripciones_abiertas')) === 'true'
@@ -53,7 +53,7 @@ async function cargarPredicciones() {
   especiales = await getEspeciales(user.id)
 }
 
-// â”€â”€ TOAST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── TOAST ─────────────────────────────────────────────
 function toast(msg, tipo = 'ok') {
   const el = document.getElementById('toast')
   if (!el) return
@@ -64,7 +64,7 @@ function toast(msg, tipo = 'ok') {
   el._t = setTimeout(() => el.classList.remove('show'), 2800)
 }
 
-// â”€â”€ AUTH PAGE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── AUTH PAGE ─────────────────────────────────────────
 function renderAuth() {
   document.getElementById('app').innerHTML = `
     <div class="hero">
@@ -83,7 +83,7 @@ function renderAuth() {
         <div id="auth-tabs" style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:6px;overflow:hidden;">
           <button id="btn-login-tab" onclick="switchAuthTab('login')"
             style="flex:1;padding:10px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;border:none;background:var(--neon-dim);color:var(--neon);text-transform:uppercase;">
-            Iniciar SesiÃ³n
+            Iniciar Sesión
           </button>
           <button id="btn-reg-tab" onclick="switchAuthTab('registro')"
             style="flex:1;padding:10px;font-family:'Orbitron',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;border:none;background:transparent;color:var(--text-dim);text-transform:uppercase;border-left:1px solid var(--border);">
@@ -93,29 +93,12 @@ function renderAuth() {
 
         <div id="form-login">
           <div class="form-group">
-            <label class="form-label">NÃºmero de identificaciÃ³n</label>
+            <label class="form-label">Número de identificación</label>
             <input class="input" id="l-id" type="text" inputmode="numeric" placeholder="Ej: 0303010339" autocomplete="off" />
           </div>
           <div class="form-group">
-            <label class="form-label">Filial</label>
-            <div style="display:flex;gap:8px;">
-              <select class="select" id="l-filial-letra" style="flex:0 0 90px;">
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-                <option value="H">H</option>
-              </select>
-              <input class="input" id="l-filial-num" type="text" inputmode="numeric"
-                placeholder="NÂ° de filial (ej: 18)" maxlength="4" autocomplete="off" style="flex:1;" />
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">ContraseÃ±a</label>
-            <input class="input" id="l-pass" type="password" placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" />
+            <label class="form-label">Contraseña</label>
+            <input class="input" id="l-pass" type="password" placeholder="••••••••" />
           </div>
           <button class="btn full" onclick="doLogin()">
             <i class="ti ti-login"></i> Entrar al torneo
@@ -123,38 +106,20 @@ function renderAuth() {
         </div>
 
         <div id="form-registro" style="display:none;">
-          ${!inscripcionesAbiertas ? `<div style="text-align:center;padding:20px;color:var(--warn);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:1px;">âš  INSCRIPCIONES CERRADAS</div>` : `
+          ${!inscripcionesAbiertas ? `<div style="text-align:center;padding:20px;color:var(--warn);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:1px;">⚠  INSCRIPCIONES CERRADAS</div>` : `
           <div class="form-group">
             <label class="form-label">Nombre completo</label>
             <input class="input" id="r-nombre" type="text" placeholder="Tu nombre" maxlength="40" />
           </div>
           <div class="form-group">
-            <label class="form-label">NÃºmero de identificaciÃ³n</label>
+            <label class="form-label">Número de identificación</label>
             <input class="input" id="r-id" type="text" inputmode="numeric" placeholder="Ej: 0303010339" autocomplete="off" />
-            <span class="form-hint">Escribe tu cÃ©dula completa, solo nÃºmeros, sin guiones ni espacios.</span>
+            <span class="form-hint">Escribe tu cédula completa, solo números, sin guiones ni espacios.</span>
           </div>
           <div class="form-group">
-            <label class="form-label">Filial (casa / apartamento)</label>
-            <div style="display:flex;gap:8px;">
-              <select class="select" id="r-filial-letra" style="flex:0 0 90px;">
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-                <option value="H">H</option>
-              </select>
-              <input class="input" id="r-filial-num" type="text" inputmode="numeric"
-                placeholder="NÂ° de filial (ej: 18)" maxlength="4" autocomplete="off" style="flex:1;" />
-            </div>
-            <span class="form-hint">Elige la letra y escribe solo el nÃºmero. Ejemplo: A + 18</span>
-          </div>
-          <div class="form-group">
-            <label class="form-label">ContraseÃ±a</label>
-            <input class="input" id="r-pass" type="password" placeholder="MÃ­nimo 8 caracteres" />
-            <span class="form-hint">MÃ­nimo 8 caracteres. Combina letras y nÃºmeros.</span>
+            <label class="form-label">Contraseña</label>
+            <input class="input" id="r-pass" type="password" placeholder="Mínimo 8 caracteres" />
+            <span class="form-hint">Mínimo 8 caracteres. Combina letras y números.</span>
           </div>
           <button class="btn full success" onclick="doRegistro()">
             <i class="ti ti-user-plus"></i> Inscribirme a la quiniela
@@ -162,7 +127,7 @@ function renderAuth() {
         </div>
       </div>
       <p style="text-align:center;font-size:12px;color:var(--text-dim);margin-top:12px;">
-        Â¿Eres admin? <span style="color:var(--neon);cursor:pointer;" onclick="showAdminLogin()">Acceso administrador</span>
+        ¿Eres admin? <span style="color:var(--neon);cursor:pointer;" onclick="showAdminLogin()">Acceso administrador</span>
       </p>
     </div>
     <div class="toast" id="toast"></div>
@@ -181,13 +146,10 @@ function renderAuth() {
 
 window.doLogin = async () => {
   const id = document.getElementById('l-id')?.value.trim()
-  const letra = document.getElementById('l-filial-letra')?.value
-  const num = document.getElementById('l-filial-num')?.value.trim()
   const pass = document.getElementById('l-pass')?.value
-  if (!id || !num || !pass) { toast('Completa todos los campos', 'err'); return }
-  const filial = letra + num
+  if (!id || !pass) { toast('Completa todos los campos', 'err'); return }
   try {
-    user = await login(id, filial, pass)
+    user = await login(id, pass)
     await cargarPredicciones()
     renderApp()
   } catch (e) { toast(e.message, 'err') }
@@ -196,17 +158,14 @@ window.doLogin = async () => {
 window.doRegistro = async () => {
   const nombre = document.getElementById('r-nombre')?.value.trim()
   const id = document.getElementById('r-id')?.value.trim()
-  const letra = document.getElementById('r-filial-letra')?.value
-  const num = document.getElementById('r-filial-num')?.value.trim()
   const pass = document.getElementById('r-pass')?.value
-  if (!nombre || !id || !num || !pass) { toast('Completa todos los campos', 'err'); return }
-  const filial = letra + num
+  if (!nombre || !id || !pass) { toast('Completa todos los campos', 'err'); return }
   try {
-    user = await registrar(nombre, id, filial, pass)
+    user = await registrar(nombre, id, pass)
     sessionStorage.setItem('user', JSON.stringify(user))
     await cargarPredicciones()
     renderApp()
-    toast('Â¡Bienvenido, ' + nombre + '!')
+    toast('¡Bienvenido, ' + nombre + '!')
   } catch (e) { toast('Error: ' + e.message, 'err') }
 }
 
@@ -227,11 +186,11 @@ window.showAdminLogin = async () => {
   }
 }
 
-// â”€â”€ MAIN APP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── MAIN APP ──────────────────────────────────────────
 function renderApp() {
   const tabs = [
     { id: 'grupos', icon: 'ti-layout-grid', label: 'Grupos' },
-    { id: 'eliminacion', icon: 'ti-tournament', label: 'EliminaciÃ³n' },
+    { id: 'eliminacion', icon: 'ti-tournament', label: 'Eliminación' },
     { id: 'especiales', icon: 'ti-star', label: 'Especiales' },
     { id: 'ranking', icon: 'ti-podium', label: 'Ranking' },
   ]
@@ -250,7 +209,7 @@ function renderApp() {
       </div>
       <div class="user-chip" style="margin-top:10px;">
         <i class="ti ti-user" style="font-size:14px;"></i>
-        ${user.nombre} <span style="opacity:0.6;">Â· Filial ${user.filial}</span>
+        ${user.nombre}
         <span style="opacity:0.5;margin:0 2px;">|</span>
         <span style="cursor:pointer;font-size:10px;" onclick="doLogout()">Salir</span>
       </div>
@@ -297,7 +256,7 @@ function renderApp() {
   setTimeout(() => montarBalon3D('ball-canvas'), 50)
 }
 
-// â”€â”€ GRUPOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── GRUPOS ────────────────────────────────────────────
 function getPredGrupo(grupo, idx) {
   return prediccionesGrupos.find(p => p.grupo === grupo && p.partido_idx === idx)
 }
@@ -315,12 +274,12 @@ function renderGrupos() {
     <div class="card fade-up">
       <div class="card-title"><i class="ti ti-layout-grid"></i>Fase de Grupos</div>
       <p style="font-size:13px;color:var(--text-dim);margin-bottom:10px;">
-        Ingresa el marcador que predices para cada partido. ${!editable ? '<span style="color:var(--warn);">Solo lectura â€” torneo en curso.</span>' : ''}
+        Ingresa el marcador que predices para cada partido. ${!editable ? '<span style="color:var(--warn);">Solo lectura — torneo en curso.</span>' : ''}
       </p>
       <div style="background:rgba(0,255,150,0.07);border:1px solid rgba(0,255,150,0.25);border-radius:6px;padding:8px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
         <i class="ti ti-device-floppy" style="color:var(--success);font-size:16px;"></i>
         <span style="font-size:12px;color:var(--success);">
-          Guardado automÃ¡tico: cada marcador se graba solo. Puedes cerrar y continuar otro dÃ­a.
+          Guardado automático: cada marcador se graba solo. Puedes cerrar y continuar otro día.
         </span>
       </div>
       <div id="progreso-txt" style="font-size:12px;color:var(--text-dim);margin-bottom:6px;">
@@ -361,7 +320,7 @@ function renderGrupos() {
               </span>
               <div class="match-fecha">
                 ${bloqueado
-                  ? '<i class="ti ti-lock"></i> Cerrado Â· ' + formatoFechaPartido(fechaISO)
+                  ? '<i class="ti ti-lock"></i> Cerrado · ' + formatoFechaPartido(fechaISO)
                   : '<i class="ti ti-clock"></i> ' + formatoFechaPartido(fechaISO)}
               </div>
             </div>`
@@ -372,9 +331,9 @@ function renderGrupos() {
   `
 
   window.saveGrupo = async (grupo, idx, e1, e2, el, field) => {
-    // Seguridad: no permitir guardar si el partido ya empezÃ³
+    // Seguridad: no permitir guardar si el partido ya empezó
     if (partidoBloqueado(fechasGrupos[`${grupo}_${idx}`])) {
-      toast('Este partido ya estÃ¡ cerrado', 'err')
+      toast('Este partido ya está cerrado', 'err')
       return
     }
     const row = document.querySelectorAll(`[data-g="${grupo}"][data-i="${idx}"]`)
@@ -388,7 +347,7 @@ function renderGrupos() {
         inp.style.borderColor = 'var(--success)'
         setTimeout(() => inp.style.borderColor = '', 1800)
       })
-      toast('âœ“ Marcador guardado')
+      toast('✓ Marcador guardado')
       actualizarProgresoGrupos()
       await calcularYGuardarPuntos(user.id)
     } catch (e) { toast('Error guardando: ' + e.message, 'err') }
@@ -405,7 +364,7 @@ function actualizarProgresoGrupos() {
   if (txt) txt.textContent = `Completados: ${completados} / ${totalPartidos}`
 }
 
-// â”€â”€ ELIMINACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ELIMINACIÓN ───────────────────────────────────────
 function getPredKO(ronda, idx) {
   return prediccionesKO.find(p => p.ronda === ronda && p.partido_idx === idx)
 }
@@ -419,15 +378,15 @@ function renderEliminacion() {
 
   cont.innerHTML = `
     <div class="card fade-up">
-      <div class="card-title"><i class="ti ti-tournament"></i>EliminaciÃ³n Directa</div>
+      <div class="card-title"><i class="ti ti-tournament"></i>Eliminación Directa</div>
       ${bloqueado
         ? `<div class="aviso-bloqueo">
              <i class="ti ti-lock"></i>
-             Esta fase ya estÃ¡ cerrada. Se cerrÃ³ al terminar la primera ronda de grupos.
+             Esta fase ya está cerrada. Se cerró al terminar la primera ronda de grupos.
            </div>`
         : `<p style="font-size:13px;color:var(--text-dim);">
-             Cada partido muestra su nÃºmero oficial y de dÃ³nde vienen los equipos.
-             Escribe tu predicciÃ³n del equipo y el marcador.
+             Cada partido muestra su número oficial y de dónde vienen los equipos.
+             Escribe tu predicción del equipo y el marcador.
            </p>
            <div class="aviso-cierre">
              <i class="ti ti-clock"></i>
@@ -451,7 +410,7 @@ function renderEliminacion() {
               <div class="ko-row">
                 <span class="ko-source">${m.l1}</span>
                 <input class="input ko-team-inp"
-                  type="text" placeholder="Tu predicciÃ³n" value="${pred?.equipo1 || ''}"
+                  type="text" placeholder="Tu predicción" value="${pred?.equipo1 || ''}"
                   onchange="saveKO('${ronda.id}',${idx},this,'t1')" ${!editable ? 'disabled' : ''} />
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s1')" ${!editable ? 'disabled' : ''}
@@ -461,7 +420,7 @@ function renderEliminacion() {
               <div class="ko-row">
                 <span class="ko-source">${m.l2}</span>
                 <input class="input ko-team-inp"
-                  type="text" placeholder="Tu predicciÃ³n" value="${pred?.equipo2 || ''}"
+                  type="text" placeholder="Tu predicción" value="${pred?.equipo2 || ''}"
                   onchange="saveKO('${ronda.id}',${idx},this,'t2')" ${!editable ? 'disabled' : ''} />
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''}
@@ -478,7 +437,7 @@ function renderEliminacion() {
 
   window.saveKO = async (ronda, idx, el, field) => {
     if (eliminacionBloqueada(fechasGrupos)) {
-      toast('La fase de eliminaciÃ³n ya estÃ¡ cerrada', 'err')
+      toast('La fase de eliminación ya está cerrada', 'err')
       return
     }
     const key = `${ronda}_${idx}`
@@ -503,14 +462,14 @@ function renderEliminacion() {
   }
 }
 
-// â”€â”€ ESPECIALES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ESPECIALES ────────────────────────────────────────
 function renderEspeciales() {
   const cont = document.getElementById('page-especiales')
   if (!cont) return
 
   const selOpts = (val) => SELECCIONES.map(s => `<option value="${s}" ${s === val ? 'selected' : ''}>${s}</option>`).join('')
 
-  // Selector de goleador agrupado por paÃ­s
+  // Selector de goleador agrupado por país
   const golEnLista = GOLEADORES.includes(especiales?.goleador)
   const golGrupos = GOLEADORES_POR_PAIS.map(g => `
     <optgroup label="${g.pais}">
@@ -527,15 +486,15 @@ function renderEspeciales() {
       ${bloqueado
         ? `<div class="aviso-bloqueo">
              <i class="ti ti-lock"></i>
-             Esta fase ya estÃ¡ cerrada. Se cerrÃ³ al terminar la primera ronda de grupos.
+             Esta fase ya está cerrada. Se cerró al terminar la primera ronda de grupos.
            </div>`
         : `<div class="aviso-cierre">
              <i class="ti ti-clock"></i>
              Puedes llenar esta fase hasta: <strong>${textoCierre(fechasGrupos)}</strong>
            </div>`}
       <div class="pts-grid" style="margin-bottom:0;margin-top:12px;">
-        <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">CampeÃ³n correcto</div></div>
-        <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">SubcampeÃ³n correcto</div></div>
+        <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">Campeón correcto</div></div>
+        <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Subcampeón correcto</div></div>
         <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Goleador correcto</div></div>
       </div>
     </div>
@@ -543,7 +502,7 @@ function renderEspeciales() {
     <div class="pick-grid fade-up">
       <div class="pick-card">
         <div id="icon-trofeo" class="pick-icon-3d"></div>
-        <div class="pick-label">CampeÃ³n del mundo</div>
+        <div class="pick-label">Campeón del mundo</div>
         <select class="select" ${dis} onchange="saveEsp('campeon',this.value)">
           <option value="">-- Selecciona --</option>
           ${selOpts(especiales?.campeon)}
@@ -551,7 +510,7 @@ function renderEspeciales() {
       </div>
       <div class="pick-card">
         <div id="icon-medalla" class="pick-icon-3d"></div>
-        <div class="pick-label">SubcampeÃ³n</div>
+        <div class="pick-label">Subcampeón</div>
         <select class="select" ${dis} onchange="saveEsp('subcampeon',this.value)">
           <option value="">-- Selecciona --</option>
           ${selOpts(especiales?.subcampeon)}
@@ -563,7 +522,7 @@ function renderEspeciales() {
         <select class="select" id="sel-goleador" ${dis} onchange="onGoleadorSelect(this.value)">
           <option value="">-- Selecciona de la lista --</option>
           ${golGrupos}
-          <option value="__OTRO__" ${especiales?.goleador && !golEnLista ? 'selected' : ''}>âœï¸ Otro jugador (escribir)</option>
+          <option value="__OTRO__" ${especiales?.goleador && !golEnLista ? 'selected' : ''}>✏️ Otro jugador (escribir)</option>
         </select>
         <input class="input" id="inp-goleador-otro" type="text" ${dis}
           placeholder="Escribe el nombre del jugador"
@@ -579,7 +538,7 @@ function renderEspeciales() {
     if (val === '__OTRO__') {
       inpOtro.style.display = 'block'
       inpOtro.focus()
-      // no guardamos aÃºn, esperamos a que escriba
+      // no guardamos aún, esperamos a que escriba
     } else {
       inpOtro.style.display = 'none'
       inpOtro.value = ''
@@ -591,14 +550,14 @@ function renderEspeciales() {
 
   window.saveEsp = async (field, val) => {
     if (eliminacionBloqueada(fechasGrupos)) {
-      toast('La fase de especiales ya estÃ¡ cerrada', 'err')
+      toast('La fase de especiales ya está cerrada', 'err')
       return
     }
     espPending[field] = val
     try {
       await guardarEspeciales(user.id, espPending.campeon || null, espPending.subcampeon || null, espPending.goleador || null)
       especiales = await getEspeciales(user.id)
-      toast('âœ“ Guardado')
+      toast('✓ Guardado')
       await calcularYGuardarPuntos(user.id)
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
@@ -610,7 +569,7 @@ function renderEspeciales() {
   }, 50)
 }
 
-// â”€â”€ RANKING â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── RANKING ───────────────────────────────────────────
 async function renderRanking() {
   const cont = document.getElementById('page-ranking')
   if (!cont) return
@@ -619,7 +578,7 @@ async function renderRanking() {
   try {
     const ranking = await getRanking()
     if (!ranking.length) {
-      cont.innerHTML = `<div class="card fade-up"><div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div><div class="empty"><i class="ti ti-users"></i>AÃºn no hay participantes con puntos</div></div>`
+      cont.innerHTML = `<div class="card fade-up"><div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div><div class="empty"><i class="ti ti-users"></i>Aún no hay participantes con puntos</div></div>`
       return
     }
 
@@ -639,10 +598,10 @@ async function renderRanking() {
             ${ranking.map((r, i) => {
               const pos = i + 1
               const cls = pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : ''
-              const medal = pos === 1 ? 'ðŸ¥‡' : pos === 2 ? 'ðŸ¥ˆ' : pos === 3 ? 'ðŸ¥‰' : pos
+              const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos
               return `<tr class="rank-row">
                 <td><span class="rank-pos ${cls}">${medal}</span></td>
-                <td style="font-weight:600;font-size:15px;">${r.participantes?.nombre || 'â€”'}</td>
+                <td style="font-weight:600;font-size:15px;">${r.participantes?.nombre || '—'}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_grupos}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_ko}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_especiales}</td>
@@ -662,7 +621,7 @@ async function renderRanking() {
           <div class="pts-item"><span class="pts-val">3</span><div class="pts-desc">Cuartos</div></div>
           <div class="pts-item"><span class="pts-val">4</span><div class="pts-desc">Semis</div></div>
           <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Final</div></div>
-          <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">CampeÃ³n</div></div>
+          <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">Campeón</div></div>
           <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Goleador</div></div>
         </div>
       </div>
@@ -672,14 +631,14 @@ async function renderRanking() {
   }
 }
 
-// â”€â”€ ADMIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── ADMIN ─────────────────────────────────────────────
 function renderAdmin() {
   const cont = document.getElementById('page-admin')
   if (!cont) return
 
   cont.innerHTML = `
     <div class="card fade-up">
-      <div class="card-title"><i class="ti ti-settings"></i>Panel de AdministraciÃ³n</div>
+      <div class="card-title"><i class="ti ti-settings"></i>Panel de Administración</div>
 
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
         <button class="btn" onclick="toggleInscripciones()">
@@ -694,14 +653,14 @@ function renderAdmin() {
       </div>
 
       <hr class="sep" />
-      <div class="card-title" style="margin-top:8px;"><i class="ti ti-calendar-event"></i>Fechas de partidos (bloqueo automÃ¡tico)</div>
+      <div class="card-title" style="margin-top:8px;"><i class="ti ti-calendar-event"></i>Fechas de partidos (bloqueo automático)</div>
       <p style="font-size:13px;color:var(--text-dim);margin-bottom:6px;">
-        Estas fechas controlan cuÃ¡ndo se bloquea cada partido. VerifÃ­calas contra el fixture oficial.
+        Estas fechas controlan cuándo se bloquea cada partido. Verifícalas contra el fixture oficial.
         Si corriges una, pulsa "Guardar fechas".
       </p>
       <div class="aviso-cierre" style="margin-bottom:14px;">
         <i class="ti ti-clock"></i>
-        EliminaciÃ³n y Especiales se cierran: <strong>${textoCierre(fechasGrupos)}</strong>
+        Eliminación y Especiales se cierran: <strong>${textoCierre(fechasGrupos)}</strong>
       </div>
       <div id="fechas-editor">
         ${GRUPOS.map(g => {
@@ -724,15 +683,15 @@ function renderAdmin() {
       </button>
 
       <hr class="sep" />
-      <div class="card-title" style="margin-top:8px;"><i class="ti ti-ball-football"></i>Resultados reales â€” Grupos</div>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Ingresa aquÃ­ los marcadores reales cuando se jueguen los partidos.</p>
+      <div class="card-title" style="margin-top:8px;"><i class="ti ti-ball-football"></i>Resultados reales — Grupos</div>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Ingresa aquí los marcadores reales cuando se jueguen los partidos.</p>
 
       <div class="admin-grid" id="admin-grupos-cont">
         ${GRUPOS.map(g => {
           const partidos = getPartidosGrupo(g)
           return partidos.map(({ e1, e2, idx }) => `
             <div class="admin-match">
-              <div class="admin-match-title">GRUPO ${g.letra} â€” P${idx + 1}</div>
+              <div class="admin-match-title">GRUPO ${g.letra} — P${idx + 1}</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:13px;flex:1;">${e1.f} ${e1.n}</span>
                 <input class="score-inp" type="number" min="0" max="20" placeholder="-"
@@ -754,23 +713,23 @@ function renderAdmin() {
       <div class="card-title" style="margin-top:8px;"><i class="ti ti-trophy"></i>Resultados especiales finales</div>
       <div class="pick-grid" style="margin-top:12px;">
         <div class="pick-card">
-          <span class="pick-icon">ðŸ†</span>
-          <div class="pick-label">CampeÃ³n real</div>
+          <span class="pick-icon">🏆</span>
+          <div class="pick-label">Campeón real</div>
           <select class="select" id="res-campeon">
             <option value="">-- Selecciona --</option>
             ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
           </select>
         </div>
         <div class="pick-card">
-          <span class="pick-icon">ðŸ¥ˆ</span>
-          <div class="pick-label">SubcampeÃ³n real</div>
+          <span class="pick-icon">🥈</span>
+          <div class="pick-label">Subcampeón real</div>
           <select class="select" id="res-subcampeon">
             <option value="">-- Selecciona --</option>
             ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
           </select>
         </div>
         <div class="pick-card">
-          <span class="pick-icon">âš½</span>
+          <span class="pick-icon">⚽</span>
           <div class="pick-label">Goleador real</div>
           <select class="select" id="res-goleador">
             <option value="">-- Selecciona --</option>
@@ -806,7 +765,7 @@ function renderAdmin() {
     if (s1 === '' || s2 === '') { toast('Ingresa ambos marcadores', 'err'); return }
     try {
       await guardarResultadoGrupo(grupo, idx, e1, e2, s1, s2)
-      toast(`âœ“ Resultado Grupo ${grupo} P${idx + 1} guardado`)
+      toast(`✓ Resultado Grupo ${grupo} P${idx + 1} guardado`)
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -817,7 +776,7 @@ function renderAdmin() {
     if (!c || !s || !g) { toast('Selecciona los 3 resultados', 'err'); return }
     try {
       await guardarResultadosEspeciales(c, s, g)
-      toast('âœ“ Resultados finales guardados')
+      toast('✓ Resultados finales guardados')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -828,7 +787,7 @@ function renderAdmin() {
       for (const p of todos || []) {
         await calcularYGuardarPuntos(p.id)
       }
-      toast('âœ“ Puntos actualizados para todos')
+      toast('✓ Puntos actualizados para todos')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -843,12 +802,12 @@ function renderAdmin() {
     try {
       await guardarFechasGrupos(nuevasFechas)
       fechasGrupos = nuevasFechas
-      toast('âœ“ Fechas guardadas correctamente')
+      toast('✓ Fechas guardadas correctamente')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 }
 
-// â”€â”€ START â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ── START ─────────────────────────────────────────────
 init()
 
 

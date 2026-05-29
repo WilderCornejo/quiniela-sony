@@ -6,19 +6,15 @@ export const supabase = createClient(
 )
 
 // ── AUTH ──────────────────────────────────────────────
-// Acceso por identificación + filial + contraseña (sin email)
+// Acceso por identificación + contraseña (sin email)
 
-export async function registrar(nombre, identificacion, filial, password) {
+export async function registrar(nombre, identificacion, password) {
   // Validaciones de seguridad
   identificacion = String(identificacion).trim()
-  filial = String(filial).trim().toUpperCase()
   nombre = String(nombre).trim()
 
   if (!/^[0-9]{6,15}$/.test(identificacion)) {
     throw new Error('La identificación debe tener entre 6 y 15 dígitos')
-  }
-  if (!/^[A-H][0-9]{1,4}$/.test(filial)) {
-    throw new Error('Filial inválida (ej: A18)')
   }
   if (nombre.length < 2 || nombre.length > 40) {
     throw new Error('El nombre debe tener entre 2 y 40 caracteres')
@@ -41,19 +37,17 @@ export async function registrar(nombre, identificacion, filial, password) {
     .insert([{
       nombre,
       identificacion,
-      filial,
       password_hash: hash + ':' + salt,
       email: null,
     }])
-    .select('id, nombre, identificacion, filial, es_admin')
+    .select('id, nombre, identificacion, es_admin')
     .single()
   if (error) throw error
   return data
 }
 
-export async function login(identificacion, filial, password) {
+export async function login(identificacion, password) {
   identificacion = String(identificacion).trim()
-  filial = String(filial).trim().toUpperCase()
 
   // Control de intentos fallidos (anti fuerza bruta)
   const intentos = JSON.parse(sessionStorage.getItem('loginIntentos') || '{"n":0,"t":0}')
@@ -64,20 +58,19 @@ export async function login(identificacion, filial, password) {
 
   const { data, error } = await supabase
     .from('participantes')
-    .select('id, nombre, identificacion, filial, es_admin, password_hash')
+    .select('id, nombre, identificacion, es_admin, password_hash')
     .eq('identificacion', identificacion)
-    .eq('filial', filial)
     .maybeSingle()
 
   if (error || !data) {
     registrarIntentoFallido()
-    throw new Error('Identificación, filial o contraseña incorrectos')
+    throw new Error('Identificación o contraseña incorrectos')
   }
 
   const ok = await verifyPassword(password, data.password_hash)
   if (!ok) {
     registrarIntentoFallido()
-    throw new Error('Identificación, filial o contraseña incorrectos')
+    throw new Error('Identificación o contraseña incorrectos')
   }
 
   // Login exitoso: limpiar intentos y NO guardar el hash en sesión
@@ -86,7 +79,6 @@ export async function login(identificacion, filial, password) {
     id: data.id,
     nombre: data.nombre,
     identificacion: data.identificacion,
-    filial: data.filial,
     es_admin: data.es_admin,
   }
   sessionStorage.setItem('user', JSON.stringify(usuarioSeguro))
