@@ -409,9 +409,11 @@ function renderEliminacion() {
               </div>
               <div class="ko-row">
                 <span class="ko-source">${m.l1}</span>
-                <input class="input ko-team-inp"
-                  type="text" placeholder="Tu predicción" value="${pred?.equipo1 || ''}"
-                  onchange="saveKO('${ronda.id}',${idx},this,'t1')" ${!editable ? 'disabled' : ''} />
+                <select class="select ko-team-inp"
+                  onchange="saveKO('${ronda.id}',${idx},this,'t1')" ${!editable ? 'disabled' : ''}>
+                  <option value="">-- Selecciona país --</option>
+                  ${SELECCIONES.map(s => `<option value="${s}" ${s === (pred?.equipo1 || '') ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s1')" ${!editable ? 'disabled' : ''}
                   data-r="${ronda.id}" data-i="${idx}" data-f="s1" />
@@ -419,9 +421,11 @@ function renderEliminacion() {
               <div class="ko-vs-divider"><span>VS</span></div>
               <div class="ko-row">
                 <span class="ko-source">${m.l2}</span>
-                <input class="input ko-team-inp"
-                  type="text" placeholder="Tu predicción" value="${pred?.equipo2 || ''}"
-                  onchange="saveKO('${ronda.id}',${idx},this,'t2')" ${!editable ? 'disabled' : ''} />
+                <select class="select ko-team-inp"
+                  onchange="saveKO('${ronda.id}',${idx},this,'t2')" ${!editable ? 'disabled' : ''}>
+                  <option value="">-- Selecciona país --</option>
+                  ${SELECCIONES.map(s => `<option value="${s}" ${s === (pred?.equipo2 || '') ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''}
                   data-r="${ronda.id}" data-i="${idx}" data-f="s2" />
@@ -710,6 +714,34 @@ function renderAdmin() {
       </div>
 
       <hr class="sep" />
+      <div class="card-title" style="margin-top:8px;"><i class="ti ti-tournament"></i>Resultados reales — Eliminatoria</div>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Selecciona los dos equipos que jugaron cada partido de eliminatoria. Deben coincidir con la lista (por eso se elige, no se escribe).</p>
+      <div class="admin-grid">
+        ${KO_ROUNDS.map(ronda => `
+          <div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:12px;color:var(--neon);margin-top:10px;text-transform:uppercase;letter-spacing:1px;">${ronda.title}</div>
+          ${ronda.matches.map((m, idx) => `
+            <div class="admin-match">
+              <div class="admin-match-title">#${m.num} ${ronda.title}</div>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <select class="select" id="rko_${ronda.id}_${idx}_t1" style="flex:1;min-width:90px;">
+                  <option value="">-- Equipo 1 --</option>
+                  ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
+                </select>
+                <span style="color:var(--text-dim);font-size:12px;">vs</span>
+                <select class="select" id="rko_${ronda.id}_${idx}_t2" style="flex:1;min-width:90px;">
+                  <option value="">-- Equipo 2 --</option>
+                  ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
+                </select>
+                <button class="btn sm success" onclick="saveResKO('${ronda.id}',${idx})">
+                  <i class="ti ti-check"></i>
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        `).join('')}
+      </div>
+
+      <hr class="sep" />
       <div class="card-title" style="margin-top:8px;"><i class="ti ti-trophy"></i>Resultados especiales finales</div>
       <div class="pick-grid" style="margin-top:12px;">
         <div class="pick-card">
@@ -766,6 +798,16 @@ function renderAdmin() {
     try {
       await guardarResultadoGrupo(grupo, idx, e1, e2, s1, s2)
       toast(`✓ Resultado Grupo ${grupo} P${idx + 1} guardado`)
+    } catch (e) { toast('Error: ' + e.message, 'err') }
+  }
+
+  window.saveResKO = async (ronda, idx) => {
+    const t1 = document.getElementById(`rko_${ronda}_${idx}_t1`)?.value
+    const t2 = document.getElementById(`rko_${ronda}_${idx}_t2`)?.value
+    if (!t1 || !t2) { toast('Selecciona ambos equipos', 'err'); return }
+    try {
+      await guardarResultadoKO(ronda, idx, t1, t2, 0, 0)
+      toast('✓ Resultado de eliminatoria guardado')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
