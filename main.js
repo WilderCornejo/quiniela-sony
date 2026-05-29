@@ -68,7 +68,7 @@ function toast(msg, tipo = 'ok') {
 function renderAuth() {
   document.getElementById('app').innerHTML = `
     <div class="hero">
-      <div class="hero-logos-row"><img src="./teletica-logo.png" class="hero-side-logo logo-teletica" alt="Teletica"><div id="ball-canvas" class="ball-canvas"></div><img src="./qbt-logo.webp" class="hero-side-logo logo-qbt" alt="QBT"></div>
+      <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
       <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
       <div class="hero-sub">${textoSedes()}</div>
@@ -241,7 +241,7 @@ function renderApp() {
 
   document.getElementById('app').innerHTML = `
     <div class="hero">
-      <div class="hero-logos-row"><img src="./teletica-logo.png" class="hero-side-logo logo-teletica" alt="Teletica"><div id="ball-canvas" class="ball-canvas"></div><img src="./qbt-logo.webp" class="hero-side-logo logo-qbt" alt="QBT"></div>
+      <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
       <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
       <div class="hero-sub">${textoSedes()}</div>
@@ -850,6 +850,7 @@ function renderAdmin() {
 
 // â”€â”€ START â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 init()
+
 
 
 
