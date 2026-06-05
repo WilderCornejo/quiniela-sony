@@ -72,9 +72,13 @@ function renderAuth() {
       <div class="hero-badge">FIFA World Cup 2026</div>
       <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
       <div class="hero-sub">${textoSedes()}</div>
-      <div class="condo-badge">
-        <i class="ti ti-building-community"></i> ${CONDOMINIO}
+      <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
+        <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
+          <span style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--neon,#00e5ff);font-size:16px;letter-spacing:3px;text-shadow:0 0 12px rgba(0,229,255,0.6);">AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp; AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp;&nbsp;</span>
+          <span style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--neon,#00e5ff);font-size:16px;letter-spacing:3px;text-shadow:0 0 12px rgba(0,229,255,0.6);">AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp; AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp;&nbsp;</span>
+        </div>
       </div>
+      <style>@keyframes aisMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}</style>
     </div>
     <div style="max-width:420px;margin:40px auto;padding:0 16px;">
       <div class="card fade-up">
@@ -176,12 +180,14 @@ window.showAdminLogin = async () => {
     const ok = await verificarAdmin(secret)
     if (ok) {
       sessionStorage.setItem('adminMode', '1')
-      renderAdmin()
-      showPage('admin')
+      user = { id: null, nombre: 'Administrador', es_admin: true }
+      renderApp()
+      window.showPage('admin')
     } else {
       toast('Clave incorrecta', 'err')
     }
   } catch (e) {
+    console.error('Admin verify error:', e)
     toast('Error verificando', 'err')
   }
 }
@@ -204,9 +210,13 @@ function renderApp() {
       <div class="hero-badge">FIFA World Cup 2026</div>
       <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
       <div class="hero-sub">${textoSedes()}</div>
-      <div class="condo-badge">
-        <i class="ti ti-building-community"></i> ${CONDOMINIO}
+      <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
+        <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
+          <span style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--neon,#00e5ff);font-size:16px;letter-spacing:3px;text-shadow:0 0 12px rgba(0,229,255,0.6);">AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp; AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp;&nbsp;</span>
+          <span style="font-family:'Orbitron',sans-serif;font-weight:700;color:var(--neon,#00e5ff);font-size:16px;letter-spacing:3px;text-shadow:0 0 12px rgba(0,229,255,0.6);">AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp; AISolution &nbsp;·&nbsp; Automatiza tu futuro &nbsp;·&nbsp;&nbsp;</span>
+        </div>
       </div>
+      <style>@keyframes aisMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}</style>
       <div class="user-chip" style="margin-top:10px;">
         <i class="ti ti-user" style="font-size:14px;"></i>
         ${user.nombre}
