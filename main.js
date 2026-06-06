@@ -8,7 +8,7 @@ import {
   getConfig, setConfig,
   getFechasGrupos, guardarFechasGrupos,
   guardarResultadoGrupo, getResultadosGrupos,
-  guardarResultadoKO, guardarResultadosEspeciales, getResultadosEspeciales
+  guardarResultadoKO, getResultadosKO, guardarResultadosEspeciales, getResultadosEspeciales
 } from './src/lib/supabase.js'
 import { GRUPOS, getPartidosGrupo, KO_ROUNDS, SELECCIONES, GOLEADORES, GOLEADORES_POR_PAIS, flagUrl, FECHAS_GRUPOS_DEFAULT } from './src/lib/data.js'
 import { montarBalon3D } from './src/lib/balon3d.js'
@@ -30,6 +30,7 @@ let prediccionesGrupos = []
 let prediccionesKO = []
 let especiales = null
 let fechasGrupos = {}
+let resultadosKO = []   // enfrentamientos de eliminatoria definidos por el admin
 
 // ── INIT ──────────────────────────────────────────────
 async function init() {
@@ -379,66 +380,60 @@ function getPredKO(ronda, idx) {
   return prediccionesKO.find(p => p.ronda === ronda && p.partido_idx === idx)
 }
 
-function renderEliminacion() {
+async function renderEliminacion() {
   const cont = document.getElementById('page-eliminacion')
   if (!cont) return
 
-  const bloqueado = eliminacionBloqueada(fechasGrupos)
-  const editable = !bloqueado
+  resultadosKO = await getResultadosKO()
+  const getMatchup = (ronda, idx) => resultadosKO.find(r => r.ronda === ronda && r.partido_idx === idx)
 
   cont.innerHTML = `
     <div class="card fade-up">
       <div class="card-title"><i class="ti ti-tournament"></i>Eliminación Directa</div>
-      ${bloqueado
-        ? `<div class="aviso-bloqueo">
-             <i class="ti ti-lock"></i>
-             Esta fase ya está cerrada. Se cerró al terminar la primera ronda de grupos.
-           </div>`
-        : `<p style="font-size:13px;color:var(--text-dim);">
-             Cada partido muestra su número oficial y de dónde vienen los equipos.
-             Escribe tu predicción del equipo y el marcador.
-           </p>
-           <div class="aviso-cierre">
-             <i class="ti ti-clock"></i>
-             Puedes llenar esta fase hasta: <strong>${textoCierre(fechasGrupos)}</strong>
-           </div>`}
+      <p style="font-size:13px;color:var(--text-dim);">
+        Los enfrentamientos los define la organización a medida que avanza el Mundial.
+        Cuando aparezcan los equipos de un partido, escribe tu <strong>marcador</strong>.
+        Puntaje: marcador exacto <strong>3 pts</strong>, solo el resultado <strong>1 pt</strong>.
+      </p>
     </div>
 
     ${KO_ROUNDS.map(ronda => `
       <div class="ko-section fade-up">
         <div class="ko-label">
           <i class="ti ${ronda.icon}"></i>${ronda.title}
-          <span style="font-size:10px;color:var(--neon);margin-left:auto;">${ronda.pts} pts por acierto</span>
+          <span style="font-size:10px;color:var(--neon);margin-left:auto;">marcador 3 &middot; resultado 1</span>
         </div>
         <div class="ko-grid">
           ${ronda.matches.map((m, idx) => {
+            const mu = getMatchup(ronda.id, idx)
+            const definido = mu && mu.equipo1 && mu.equipo2
+            const jugado = mu && mu.jugado
+            const editable = definido && !jugado
             const pred = getPredKO(ronda.id, idx)
+            if (!definido) {
+              return `<div class="ko-match">
+                <div class="ko-match-head"><span class="ko-num">#${m.num}</span> ${ronda.title}</div>
+                <div style="padding:18px 10px;text-align:center;color:var(--text-dim);font-size:13px;">
+                  <i class="ti ti-clock"></i><br>Partido por definir<br>
+                  <span style="font-size:11px;opacity:.8;">${m.l1} vs ${m.l2}</span>
+                </div>
+              </div>`
+            }
             return `<div class="ko-match">
               <div class="ko-match-head">
                 <span class="ko-num">#${m.num}</span> ${ronda.title}
+                ${jugado ? `<span style="margin-left:auto;color:var(--success);font-size:10px;font-weight:bold;">FINAL ${mu.goles1}-${mu.goles2}</span>` : ''}
               </div>
               <div class="ko-row">
-                <span class="ko-source">${m.l1}</span>
-                <select class="select ko-team-inp"
-                  onchange="saveKO('${ronda.id}',${idx},this,'t1')" ${!editable ? 'disabled' : ''}>
-                  <option value="">-- Selecciona país --</option>
-                  ${SELECCIONES.map(s => `<option value="${s}" ${s === (pred?.equipo1 || '') ? 'selected' : ''}>${s}</option>`).join('')}
-                </select>
+                <span class="ko-source"><img src="${flagUrl(mu.equipo1)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo1}</span>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
-                  onchange="saveKO('${ronda.id}',${idx},this,'s1')" ${!editable ? 'disabled' : ''}
-                  data-r="${ronda.id}" data-i="${idx}" data-f="s1" />
+                  onchange="saveKO('${ronda.id}',${idx},this,'s1')" ${!editable ? 'disabled' : ''} />
               </div>
               <div class="ko-vs-divider"><span>VS</span></div>
               <div class="ko-row">
-                <span class="ko-source">${m.l2}</span>
-                <select class="select ko-team-inp"
-                  onchange="saveKO('${ronda.id}',${idx},this,'t2')" ${!editable ? 'disabled' : ''}>
-                  <option value="">-- Selecciona país --</option>
-                  ${SELECCIONES.map(s => `<option value="${s}" ${s === (pred?.equipo2 || '') ? 'selected' : ''}>${s}</option>`).join('')}
-                </select>
+                <span class="ko-source"><img src="${flagUrl(mu.equipo2)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo2}</span>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
-                  onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''}
-                  data-r="${ronda.id}" data-i="${idx}" data-f="s2" />
+                  onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''} />
               </div>
             </div>`
           }).join('')}
@@ -450,23 +445,21 @@ function renderEliminacion() {
   const pendingKO = {}
 
   window.saveKO = async (ronda, idx, el, field) => {
-    if (eliminacionBloqueada(fechasGrupos)) {
-      toast('La fase de eliminación ya está cerrada', 'err')
-      return
-    }
+    const mu = resultadosKO.find(r => r.ronda === ronda && r.partido_idx === idx)
+    if (!mu || !mu.equipo1 || !mu.equipo2) { toast('Este partido aún no tiene equipos definidos', 'err'); return }
+    if (mu.jugado) { toast('Este partido ya finalizó', 'err'); return }
     const key = `${ronda}_${idx}`
     if (!pendingKO[key]) pendingKO[key] = {}
     pendingKO[key][field] = el.value
 
     const pred = getPredKO(ronda, idx)
     const merged = {
-      t1: pred?.equipo1 || '', t2: pred?.equipo2 || '',
       s1: pred?.goles1 ?? '', s2: pred?.goles2 ?? '',
       ...pendingKO[key]
     }
-    if (merged.t1 && merged.t2) {
+    if (merged.s1 !== '' && merged.s2 !== '') {
       try {
-        await guardarPrediccionKO(user.id, ronda, idx, merged.t1, merged.t2, merged.s1 || 0, merged.s2 || 0)
+        await guardarPrediccionKO(user.id, ronda, idx, mu.equipo1, mu.equipo2, merged.s1, merged.s2)
         prediccionesKO = await getPrediccionesKO(user.id)
         el.style.borderColor = 'var(--success)'
         setTimeout(() => el.style.borderColor = '', 1500)
@@ -646,9 +639,11 @@ async function renderRanking() {
 }
 
 // ── ADMIN ─────────────────────────────────────────────
-function renderAdmin() {
+async function renderAdmin() {
   const cont = document.getElementById('page-admin')
   if (!cont) return
+
+  resultadosKO = await getResultadosKO()
 
   cont.innerHTML = `
     <div class="card fade-up">
@@ -725,29 +720,35 @@ function renderAdmin() {
 
       <hr class="sep" />
       <div class="card-title" style="margin-top:8px;"><i class="ti ti-tournament"></i>Resultados reales — Eliminatoria</div>
-      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Selecciona los dos equipos que jugaron cada partido de eliminatoria. Deben coincidir con la lista (por eso se elige, no se escribe).</p>
+      <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px;">Para cada partido: 1) elegí los dos equipos que juegan (así los usuarios pueden predecir). 2) Cuando se juegue, poné el marcador real y marcá <strong>“Ya se jugó”</strong> para que cuente en los puntos.</p>
       <div class="admin-grid">
         ${KO_ROUNDS.map(ronda => `
           <div style="grid-column:1/-1;font-family:'Orbitron',monospace;font-size:12px;color:var(--neon);margin-top:10px;text-transform:uppercase;letter-spacing:1px;">${ronda.title}</div>
-          ${ronda.matches.map((m, idx) => `
+          ${ronda.matches.map((m, idx) => {
+            const mu = resultadosKO.find(r => r.ronda === ronda.id && r.partido_idx === idx) || {}
+            return `
             <div class="admin-match">
-              <div class="admin-match-title">#${m.num} ${ronda.title}</div>
-              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                <select class="select" id="rko_${ronda.id}_${idx}_t1" style="flex:1;min-width:90px;">
+              <div class="admin-match-title">#${m.num} ${ronda.title} <span style="color:var(--text-dim);font-size:10px;font-weight:normal;">(${m.l1} vs ${m.l2})</span></div>
+              <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+                <select class="select" id="rko_${ronda.id}_${idx}_t1" style="flex:1;min-width:78px;">
                   <option value="">-- Equipo 1 --</option>
-                  ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
+                  ${SELECCIONES.map(s => `<option ${s === mu.equipo1 ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
-                <span style="color:var(--text-dim);font-size:12px;">vs</span>
-                <select class="select" id="rko_${ronda.id}_${idx}_t2" style="flex:1;min-width:90px;">
+                <input class="score-inp" type="number" min="0" max="20" id="rko_${ronda.id}_${idx}_s1" value="${mu.jugado ? (mu.goles1 ?? '') : ''}" placeholder="-" style="width:42px;" />
+                <span style="color:var(--text-dim);font-size:12px;">-</span>
+                <input class="score-inp" type="number" min="0" max="20" id="rko_${ronda.id}_${idx}_s2" value="${mu.jugado ? (mu.goles2 ?? '') : ''}" placeholder="-" style="width:42px;" />
+                <select class="select" id="rko_${ronda.id}_${idx}_t2" style="flex:1;min-width:78px;">
                   <option value="">-- Equipo 2 --</option>
-                  ${SELECCIONES.map(s => `<option>${s}</option>`).join('')}
+                  ${SELECCIONES.map(s => `<option ${s === mu.equipo2 ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
-                <button class="btn sm success" onclick="saveResKO('${ronda.id}',${idx})">
-                  <i class="ti ti-check"></i>
-                </button>
               </div>
+              <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-dim);cursor:pointer;">
+                <input type="checkbox" id="rko_${ronda.id}_${idx}_jug" ${mu.jugado ? 'checked' : ''} style="width:16px;height:16px;" />
+                Ya se jugó (cuenta para los puntos)
+                <button class="btn sm success" style="margin-left:auto;" onclick="saveResKO('${ronda.id}',${idx})"><i class="ti ti-check"></i> Guardar</button>
+              </label>
             </div>
-          `).join('')}
+          `}).join('')}
         `).join('')}
       </div>
 
@@ -814,10 +815,15 @@ function renderAdmin() {
   window.saveResKO = async (ronda, idx) => {
     const t1 = document.getElementById(`rko_${ronda}_${idx}_t1`)?.value
     const t2 = document.getElementById(`rko_${ronda}_${idx}_t2`)?.value
+    const s1 = document.getElementById(`rko_${ronda}_${idx}_s1`)?.value
+    const s2 = document.getElementById(`rko_${ronda}_${idx}_s2`)?.value
+    const jugado = document.getElementById(`rko_${ronda}_${idx}_jug`)?.checked
     if (!t1 || !t2) { toast('Selecciona ambos equipos', 'err'); return }
+    if (jugado && (s1 === '' || s2 === '')) { toast('Si ya se jugó, ingresa el marcador', 'err'); return }
     try {
-      await guardarResultadoKO(ronda, idx, t1, t2, 0, 0)
-      toast('✓ Resultado de eliminatoria guardado')
+      await guardarResultadoKO(ronda, idx, t1, t2, s1 || 0, s2 || 0, jugado)
+      resultadosKO = await getResultadosKO()
+      toast(jugado ? '✓ Resultado guardado (cuenta para puntos)' : '✓ Enfrentamiento guardado (abierto para predicciones)')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 

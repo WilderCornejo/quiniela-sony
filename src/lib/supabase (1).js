@@ -201,12 +201,19 @@ export async function getResultadosGrupos() {
   return data || []
 }
 
-export async function guardarResultadoKO(ronda, partido_idx, equipo1, equipo2, goles1, goles2) {
+export async function guardarResultadoKO(ronda, partido_idx, equipo1, equipo2, goles1, goles2, jugado = false) {
   const { error } = await supabase.from('resultados_ko').upsert({
     ronda, partido_idx, equipo1, equipo2,
-    goles1: parseInt(goles1), goles2: parseInt(goles2), jugado: true
+    goles1: parseInt(goles1) || 0, goles2: parseInt(goles2) || 0, jugado: !!jugado
   }, { onConflict: 'ronda,partido_idx' })
   if (error) throw error
+}
+
+// Trae TODOS los partidos de eliminatoria definidos por el admin (con o sin jugar)
+// para mostrarle al usuario los enfrentamientos y que prediga el marcador.
+export async function getResultadosKO() {
+  const { data } = await supabase.from('resultados_ko').select('*')
+  return data || []
 }
 
 export async function guardarResultadosEspeciales(campeon, subcampeon, goleador) {
@@ -254,9 +261,14 @@ export async function calcularYGuardarPuntos(participante_id) {
   for (const pred of predKO) {
     const real = (resKO || []).find(r => r.ronda === pred.ronda && r.partido_idx === pred.partido_idx)
     if (!real) continue
-    const rondasPts = { dieciseisavos: 2, octavos: 3, cuartos: 4, semis: 5, tercer_puesto: 4, final: 8 }
-    const pts = rondasPts[pred.ronda] || 2
-    if (pred.equipo1 === real.equipo1 && pred.equipo2 === real.equipo2) pts_ko += pts
+    // Puntaje por marcador (igual que en grupos): exacto = 3, solo el resultado = 1, lo demas = 0
+    if (pred.goles1 === real.goles1 && pred.goles2 === real.goles2) {
+      pts_ko += 3 // marcador exacto
+    } else {
+      const predGanador = pred.goles1 > pred.goles2 ? 1 : pred.goles2 > pred.goles1 ? 2 : 0
+      const realGanador = real.goles1 > real.goles2 ? 1 : real.goles2 > real.goles1 ? 2 : 0
+      if (predGanador === realGanador) pts_ko += 1 // solo el resultado (ganador o empate)
+    }
   }
 
   let pts_especiales = 0
