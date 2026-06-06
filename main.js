@@ -32,6 +32,14 @@ let especiales = null
 let fechasGrupos = {}
 let resultadosKO = []   // enfrentamientos de eliminatoria definidos por el admin
 
+// Mapa nombre de equipo -> codigo de pais (los grupos tienen todos los equipos con su codigo)
+const NOMBRE_A_CODIGO = {}
+GRUPOS.forEach(g => getPartidosGrupo(g).forEach(({ e1, e2 }) => {
+  if (e1) NOMBRE_A_CODIGO[e1.n] = e1.c
+  if (e2) NOMBRE_A_CODIGO[e2.n] = e2.c
+}))
+const banderaDe = (nombre) => flagUrl(NOMBRE_A_CODIGO[nombre] || '')
+
 // ── INIT ──────────────────────────────────────────────
 async function init() {
   user = getUser()
@@ -425,13 +433,13 @@ async function renderEliminacion() {
                 ${jugado ? `<span style="margin-left:auto;color:var(--success);font-size:10px;font-weight:bold;">FINAL ${mu.goles1}-${mu.goles2}</span>` : ''}
               </div>
               <div class="ko-row">
-                <span class="ko-source"><img src="${flagUrl(mu.equipo1)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo1}</span>
+                <span class="ko-source"><img src="${banderaDe(mu.equipo1)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo1}</span>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s1')" ${!editable ? 'disabled' : ''} />
               </div>
               <div class="ko-vs-divider"><span>VS</span></div>
               <div class="ko-row">
-                <span class="ko-source"><img src="${flagUrl(mu.equipo2)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo2}</span>
+                <span class="ko-source"><img src="${banderaDe(mu.equipo2)}" onerror="this.style.display='none'" style="width:22px;height:15px;vertical-align:middle;margin-right:5px;border-radius:2px;" />${mu.equipo2}</span>
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''} />
               </div>
