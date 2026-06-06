@@ -702,13 +702,13 @@ async function renderAdmin() {
             <div class="admin-match">
               <div class="admin-match-title">GRUPO ${g.letra} — P${idx + 1}</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-                <span style="font-size:13px;flex:1;">${e1.f} ${e1.n}</span>
+                <span style="font-size:13px;flex:1;display:flex;align-items:center;gap:5px;"><img src="${flagUrl(e1.c)}" alt="${e1.n}" onerror="this.style.display='none'" style="width:22px;height:15px;border-radius:2px;" />${e1.n}</span>
                 <input class="score-inp" type="number" min="0" max="20" placeholder="-"
                   id="rg_${g.letra}_${idx}_s1" style="width:36px;" />
                 <span style="color:var(--text-dim);">:</span>
                 <input class="score-inp" type="number" min="0" max="20" placeholder="-"
                   id="rg_${g.letra}_${idx}_s2" style="width:36px;" />
-                <span style="font-size:13px;flex:1;text-align:right;">${e2.n} ${e2.f}</span>
+                <span style="font-size:13px;flex:1;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:5px;">${e2.n}<img src="${flagUrl(e2.c)}" alt="${e2.n}" onerror="this.style.display='none'" style="width:22px;height:15px;border-radius:2px;" /></span>
                 <button class="btn sm success" onclick="saveResGrupo('${g.letra}',${idx},'${e1.n}','${e2.n}')">
                   <i class="ti ti-check"></i>
                 </button>
