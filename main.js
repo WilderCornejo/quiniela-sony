@@ -730,14 +730,14 @@ async function renderAdmin() {
             <div class="admin-match">
               <div class="admin-match-title">#${m.num} ${ronda.title} <span style="color:var(--text-dim);font-size:10px;font-weight:normal;">(${m.l1} vs ${m.l2})</span></div>
               <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-                <select class="select" id="rko_${ronda.id}_${idx}_t1" style="flex:1;min-width:78px;">
+                <select class="select ko-adm-sel" data-koronda="${ronda.id}" onchange="refreshKOOptions('${ronda.id}')" id="rko_${ronda.id}_${idx}_t1" style="flex:1;min-width:78px;">
                   <option value="">-- Equipo 1 --</option>
                   ${SELECCIONES.map(s => `<option ${s === mu.equipo1 ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
                 <input class="score-inp" type="number" min="0" max="20" id="rko_${ronda.id}_${idx}_s1" value="${mu.jugado ? (mu.goles1 ?? '') : ''}" placeholder="-" style="width:42px;" />
                 <span style="color:var(--text-dim);font-size:12px;">-</span>
                 <input class="score-inp" type="number" min="0" max="20" id="rko_${ronda.id}_${idx}_s2" value="${mu.jugado ? (mu.goles2 ?? '') : ''}" placeholder="-" style="width:42px;" />
-                <select class="select" id="rko_${ronda.id}_${idx}_t2" style="flex:1;min-width:78px;">
+                <select class="select ko-adm-sel" data-koronda="${ronda.id}" onchange="refreshKOOptions('${ronda.id}')" id="rko_${ronda.id}_${idx}_t2" style="flex:1;min-width:78px;">
                   <option value="">-- Equipo 2 --</option>
                   ${SELECCIONES.map(s => `<option ${s === mu.equipo2 ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
@@ -819,12 +819,26 @@ async function renderAdmin() {
     const s2 = document.getElementById(`rko_${ronda}_${idx}_s2`)?.value
     const jugado = document.getElementById(`rko_${ronda}_${idx}_jug`)?.checked
     if (!t1 || !t2) { toast('Selecciona ambos equipos', 'err'); return }
+    if (t1 === t2) { toast('Un equipo no puede jugar contra sí mismo', 'err'); return }
     if (jugado && (s1 === '' || s2 === '')) { toast('Si ya se jugó, ingresa el marcador', 'err'); return }
     try {
       await guardarResultadoKO(ronda, idx, t1, t2, s1 || 0, s2 || 0, jugado)
       resultadosKO = await getResultadosKO()
       toast(jugado ? '✓ Resultado guardado (cuenta para puntos)' : '✓ Enfrentamiento guardado (abierto para predicciones)')
     } catch (e) { toast('Error: ' + e.message, 'err') }
+  }
+
+  // Filtra las listas: un equipo elegido en un partido desaparece de los demas de esa ronda
+  window.refreshKOOptions = (ronda) => {
+    const selects = Array.from(document.querySelectorAll(`select.ko-adm-sel[data-koronda="${ronda}"]`))
+    selects.forEach(sel => {
+      const current = sel.value
+      const usadosOtros = selects.filter(s => s !== sel).map(s => s.value).filter(Boolean)
+      const disp = SELECCIONES.filter(s => s === current || !usadosOtros.includes(s))
+      const esT1 = sel.id.endsWith('_t1')
+      sel.innerHTML = `<option value="">-- Equipo ${esT1 ? '1' : '2'} --</option>` +
+        disp.map(s => `<option ${s === current ? 'selected' : ''}>${s}</option>`).join('')
+    })
   }
 
   window.saveResEspeciales = async () => {
@@ -863,6 +877,9 @@ async function renderAdmin() {
       toast('✓ Fechas guardadas correctamente')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
+
+  // Aplica el filtrado inicial segun los partidos ya guardados
+  KO_ROUNDS.forEach(r => window.refreshKOOptions(r.id))
 }
 
 // ── START ─────────────────────────────────────────────
