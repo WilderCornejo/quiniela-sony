@@ -140,12 +140,13 @@ export async function guardarFechasGrupos(fechas) {
 
 // ── PREDICCIONES GRUPOS ───────────────────────────────
 export async function guardarPrediccionGrupo(participante_id, grupo, partido_idx, equipo1, equipo2, goles1, goles2) {
-  const { error } = await supabase.from('predicciones_grupos').upsert({
-    participante_id, grupo, partido_idx, equipo1, equipo2,
-    goles1: parseInt(goles1), goles2: parseInt(goles2),
-    actualizado_en: new Date().toISOString()
-  }, { onConflict: 'participante_id,grupo,partido_idx' })
-  if (error) throw error
+  // El guardado pasa por una funcion del servidor que valida el cierre por hora (Costa Rica)
+  const { error } = await supabase.rpc('guardar_pred_grupo', {
+    p_pid: participante_id, p_grupo: grupo, p_idx: partido_idx,
+    p_e1: equipo1, p_e2: equipo2,
+    p_g1: parseInt(goles1), p_g2: parseInt(goles2)
+  })
+  if (error) throw new Error(error.message || 'No se pudo guardar')
 }
 
 export async function getPrediccionesGrupos(participante_id) {
@@ -155,12 +156,12 @@ export async function getPrediccionesGrupos(participante_id) {
 
 // ── PREDICCIONES KO ───────────────────────────────────
 export async function guardarPrediccionKO(participante_id, ronda, partido_idx, equipo1, equipo2, goles1, goles2) {
-  const { error } = await supabase.from('predicciones_ko').upsert({
-    participante_id, ronda, partido_idx, equipo1, equipo2,
-    goles1: parseInt(goles1) || 0, goles2: parseInt(goles2) || 0,
-    actualizado_en: new Date().toISOString()
-  }, { onConflict: 'participante_id,ronda,partido_idx' })
-  if (error) throw error
+  const { error } = await supabase.rpc('guardar_pred_ko', {
+    p_pid: participante_id, p_ronda: ronda, p_idx: partido_idx,
+    p_e1: equipo1, p_e2: equipo2,
+    p_g1: parseInt(goles1) || 0, p_g2: parseInt(goles2) || 0
+  })
+  if (error) throw new Error(error.message || 'No se pudo guardar')
 }
 
 export async function getPrediccionesKO(participante_id) {
@@ -170,11 +171,10 @@ export async function getPrediccionesKO(participante_id) {
 
 // ── PREDICCIONES ESPECIALES ───────────────────────────
 export async function guardarEspeciales(participante_id, campeon, subcampeon, goleador) {
-  const { error } = await supabase.from('predicciones_especiales').upsert({
-    participante_id, campeon, subcampeon, goleador,
-    actualizado_en: new Date().toISOString()
-  }, { onConflict: 'participante_id' })
-  if (error) throw error
+  const { error } = await supabase.rpc('guardar_pred_especiales', {
+    p_pid: participante_id, p_campeon: campeon, p_subcampeon: subcampeon, p_goleador: goleador
+  })
+  if (error) throw new Error(error.message || 'No se pudo guardar')
 }
 
 export async function getEspeciales(participante_id) {
@@ -196,10 +196,11 @@ export async function getResultadosGrupos() {
   return data || []
 }
 
-export async function guardarResultadoKO(ronda, partido_idx, equipo1, equipo2, goles1, goles2, jugado = false) {
+export async function guardarResultadoKO(ronda, partido_idx, equipo1, equipo2, goles1, goles2, jugado = false, fecha = null) {
   const { error } = await supabase.from('resultados_ko').upsert({
     ronda, partido_idx, equipo1, equipo2,
-    goles1: parseInt(goles1) || 0, goles2: parseInt(goles2) || 0, jugado: !!jugado
+    goles1: parseInt(goles1) || 0, goles2: parseInt(goles2) || 0, jugado: !!jugado,
+    fecha: fecha || null
   }, { onConflict: 'ronda,partido_idx' })
   if (error) throw error
 }

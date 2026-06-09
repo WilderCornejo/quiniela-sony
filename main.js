@@ -410,8 +410,9 @@ async function renderEliminacion() {
           ${ronda.matches.map((m, idx) => {
             const mu = getMatchup(ronda.id, idx)
             const definido = mu && mu.equipo1 && mu.equipo2
+            const cerradoHora = definido && mu.fecha ? partidoBloqueado(mu.fecha) : false
             const jugado = mu && mu.jugado
-            const editable = definido && !jugado
+            const editable = definido && !jugado && !cerradoHora
             const pred = getPredKO(ronda.id, idx)
             if (!definido) {
               return `<div class="ko-match">
@@ -438,6 +439,7 @@ async function renderEliminacion() {
                 <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
                   onchange="saveKO('${ronda.id}',${idx},this,'s2')" ${!editable ? 'disabled' : ''} />
               </div>
+              ${mu.fecha ? `<div class="match-fecha" style="margin-top:6px;text-align:center;">${(jugado || cerradoHora) ? '<i class="ti ti-lock"></i> Cerrado · ' : '<i class="ti ti-clock"></i> '}${formatoFechaPartido(mu.fecha)}</div>` : ''}
             </div>`
           }).join('')}
         </div>
@@ -451,6 +453,7 @@ async function renderEliminacion() {
     const mu = resultadosKO.find(r => r.ronda === ronda && r.partido_idx === idx)
     if (!mu || !mu.equipo1 || !mu.equipo2) { toast('Este partido aún no tiene equipos definidos', 'err'); return }
     if (mu.jugado) { toast('Este partido ya finalizó', 'err'); return }
+    if (mu.fecha && partidoBloqueado(mu.fecha)) { toast('Este partido ya cerró (pasó su hora de inicio)', 'err'); return }
     const key = `${ronda}_${idx}`
     if (!pendingKO[key]) pendingKO[key] = {}
     pendingKO[key][field] = el.value
@@ -741,6 +744,10 @@ async function renderAdmin() {
                   ${SELECCIONES.map(s => `<option ${s === mu.equipo2 ? 'selected' : ''}>${s}</option>`).join('')}
                 </select>
               </div>
+              <div style="margin-top:8px;display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;color:var(--text-dim);min-width:70px;">Inicio:</span>
+                <input class="input" type="datetime-local" id="rko_${ronda.id}_${idx}_fecha" value="${mu.fecha || ''}" style="flex:1;font-size:12px;padding:4px 6px;" />
+              </div>
               <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--text-dim);cursor:pointer;">
                 <input type="checkbox" id="rko_${ronda.id}_${idx}_jug" ${mu.jugado ? 'checked' : ''} style="width:16px;height:16px;" />
                 Ya se jugó (cuenta para los puntos)
@@ -819,11 +826,12 @@ async function renderAdmin() {
     const s1 = document.getElementById(`rko_${ronda}_${idx}_s1`)?.value
     const s2 = document.getElementById(`rko_${ronda}_${idx}_s2`)?.value
     const jugado = document.getElementById(`rko_${ronda}_${idx}_jug`)?.checked
+    const fecha = document.getElementById(`rko_${ronda}_${idx}_fecha`)?.value || null
     if (!t1 || !t2) { toast('Selecciona ambos equipos', 'err'); return }
     if (t1 === t2) { toast('Un equipo no puede jugar contra sí mismo', 'err'); return }
     if (jugado && (s1 === '' || s2 === '')) { toast('Si ya se jugó, ingresa el marcador', 'err'); return }
     try {
-      await guardarResultadoKO(ronda, idx, t1, t2, s1 || 0, s2 || 0, jugado)
+      await guardarResultadoKO(ronda, idx, t1, t2, s1 || 0, s2 || 0, jugado, fecha)
       resultadosKO = await getResultadosKO()
       if (jugado) {
         toast('✓ Resultado guardado, recalculando puntos...')
