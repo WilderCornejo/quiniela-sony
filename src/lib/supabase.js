@@ -8,14 +8,9 @@ export const supabase = createClient(
 // ── AUTH ──────────────────────────────────────────────
 // Acceso por identificación + contraseña (sin email)
 
-export async function registrar(nombre, identificacion, password) {
-  // Validaciones de seguridad
-  identificacion = String(identificacion).trim()
+export async function registrar(nombre, password) {
   nombre = String(nombre).trim()
 
-  if (!/^[0-9]{6,15}$/.test(identificacion)) {
-    throw new Error('La identificación debe tener entre 6 y 15 dígitos')
-  }
   if (nombre.length < 2 || nombre.length > 40) {
     throw new Error('El nombre debe tener entre 2 y 40 caracteres')
   }
@@ -23,31 +18,33 @@ export async function registrar(nombre, identificacion, password) {
     throw new Error('La contraseña debe tener al menos 8 caracteres')
   }
 
-  // Verificar que la identificación no exista ya
+  // El nombre es el identificador de ingreso: no puede repetirse
   const { data: existe } = await supabase
     .from('participantes')
     .select('id')
-    .eq('identificacion', identificacion)
+    .eq('nombre', nombre)
     .maybeSingle()
-  if (existe) throw new Error('Esa identificación ya está registrada')
+  if (existe) throw new Error('Ese nombre ya está en uso. Elige otro (puedes agregar un apodo o inicial).')
 
   const { hash, salt } = await hashPassword(password)
   const { data, error } = await supabase
     .from('participantes')
     .insert([{
       nombre,
-      identificacion,
       password_hash: hash + ':' + salt,
       email: null,
     }])
-    .select('id, nombre, identificacion, es_admin')
+    .select('id, nombre, es_admin')
     .single()
-  if (error) throw error
+  if (error) {
+    if (error.code === '23505') throw new Error('Ese nombre ya está en uso. Elige otro.')
+    throw error
+  }
   return data
 }
 
-export async function login(identificacion, password) {
-  identificacion = String(identificacion).trim()
+export async function login(nombre, password) {
+  nombre = String(nombre).trim()
 
   // Control de intentos fallidos (anti fuerza bruta)
   const intentos = JSON.parse(sessionStorage.getItem('loginIntentos') || '{"n":0,"t":0}')
@@ -58,27 +55,25 @@ export async function login(identificacion, password) {
 
   const { data, error } = await supabase
     .from('participantes')
-    .select('id, nombre, identificacion, es_admin, password_hash')
-    .eq('identificacion', identificacion)
+    .select('id, nombre, es_admin, password_hash')
+    .eq('nombre', nombre)
     .maybeSingle()
 
   if (error || !data) {
     registrarIntentoFallido()
-    throw new Error('Identificación o contraseña incorrectos')
+    throw new Error('Nombre o contraseña incorrectos')
   }
 
   const ok = await verifyPassword(password, data.password_hash)
   if (!ok) {
     registrarIntentoFallido()
-    throw new Error('Identificación o contraseña incorrectos')
+    throw new Error('Nombre o contraseña incorrectos')
   }
 
-  // Login exitoso: limpiar intentos y NO guardar el hash en sesión
   sessionStorage.removeItem('loginIntentos')
   const usuarioSeguro = {
     id: data.id,
     nombre: data.nombre,
-    identificacion: data.identificacion,
     es_admin: data.es_admin,
   }
   sessionStorage.setItem('user', JSON.stringify(usuarioSeguro))

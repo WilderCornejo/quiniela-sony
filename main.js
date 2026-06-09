@@ -106,8 +106,9 @@ function renderAuth() {
 
         <div id="form-login">
           <div class="form-group">
-            <label class="form-label">Número de identificación</label>
-            <input class="input" id="l-id" type="text" inputmode="numeric" placeholder="Ej: 0303010339" autocomplete="off" />
+            <label class="form-label">Nombre</label>
+            <input class="input" id="l-id" type="text" placeholder="Tu nombre" autocomplete="off" />
+            <span class="form-hint">Escríbelo tal como te registraste.</span>
           </div>
           <div class="form-group">
             <label class="form-label">Contraseña</label>
@@ -121,13 +122,9 @@ function renderAuth() {
         <div id="form-registro" style="display:none;">
           ${!inscripcionesAbiertas ? `<div style="text-align:center;padding:20px;color:var(--warn);font-family:'Orbitron',monospace;font-size:11px;letter-spacing:1px;">⚠  INSCRIPCIONES CERRADAS</div>` : `
           <div class="form-group">
-            <label class="form-label">Nombre completo</label>
+            <label class="form-label">Nombre</label>
             <input class="input" id="r-nombre" type="text" placeholder="Tu nombre" maxlength="40" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Número de identificación</label>
-            <input class="input" id="r-id" type="text" inputmode="numeric" placeholder="Ej: 0303010339" autocomplete="off" />
-            <span class="form-hint">Escribe tu cédula completa, solo números, sin guiones ni espacios.</span>
+            <span class="form-hint">Será tu nombre para ingresar. Si ya está tomado, agrégale algo que te distinga (apodo, inicial).</span>
           </div>
           <div class="form-group">
             <label class="form-label">Contraseña</label>
@@ -158,11 +155,11 @@ function renderAuth() {
 }
 
 window.doLogin = async () => {
-  const id = document.getElementById('l-id')?.value.trim()
+  const nombre = document.getElementById('l-id')?.value.trim()
   const pass = document.getElementById('l-pass')?.value
-  if (!id || !pass) { toast('Completa todos los campos', 'err'); return }
+  if (!nombre || !pass) { toast('Completa todos los campos', 'err'); return }
   try {
-    user = await login(id, pass)
+    user = await login(nombre, pass)
     await cargarPredicciones()
     renderApp()
   } catch (e) { toast(e.message, 'err') }
@@ -170,11 +167,10 @@ window.doLogin = async () => {
 
 window.doRegistro = async () => {
   const nombre = document.getElementById('r-nombre')?.value.trim()
-  const id = document.getElementById('r-id')?.value.trim()
   const pass = document.getElementById('r-pass')?.value
-  if (!nombre || !id || !pass) { toast('Completa todos los campos', 'err'); return }
+  if (!nombre || !pass) { toast('Completa todos los campos', 'err'); return }
   try {
-    user = await registrar(nombre, id, pass)
+    user = await registrar(nombre, pass)
     sessionStorage.setItem('user', JSON.stringify(user))
     await cargarPredicciones()
     renderApp()
