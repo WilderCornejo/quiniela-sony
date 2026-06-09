@@ -596,6 +596,7 @@ async function renderRanking() {
     cont.innerHTML = `
       <div class="card fade-up">
         <div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div>
+        <p style="font-size:12px;color:var(--text-dim);margin:-4px 0 14px;"><i class="ti ti-info-circle"></i> Se muestran los 50 mejores rankeados.</p>
         <table class="rank-table">
           <thead><tr>
             <th>#</th>
@@ -626,13 +627,10 @@ async function renderRanking() {
       <div class="card fade-up">
         <div class="card-title"><i class="ti ti-info-circle"></i>Sistema de puntos</div>
         <div class="pts-grid">
-          <div class="pts-item"><span class="pts-val">3</span><div class="pts-desc">Marcador exacto grupos</div></div>
-          <div class="pts-item"><span class="pts-val">1</span><div class="pts-desc">Ganador grupos</div></div>
-          <div class="pts-item"><span class="pts-val">2</span><div class="pts-desc">Octavos</div></div>
-          <div class="pts-item"><span class="pts-val">3</span><div class="pts-desc">Cuartos</div></div>
-          <div class="pts-item"><span class="pts-val">4</span><div class="pts-desc">Semis</div></div>
-          <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Final</div></div>
+          <div class="pts-item"><span class="pts-val">3</span><div class="pts-desc">Marcador exacto (grupos y eliminatoria)</div></div>
+          <div class="pts-item"><span class="pts-val">1</span><div class="pts-desc">Solo el resultado (ganador o empate)</div></div>
           <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">Campeón</div></div>
+          <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Subcampeón</div></div>
           <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Goleador</div></div>
         </div>
       </div>
