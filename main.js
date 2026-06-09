@@ -4,7 +4,7 @@ import {
   guardarPrediccionGrupo, getPrediccionesGrupos,
   guardarPrediccionKO, getPrediccionesKO,
   guardarEspeciales, getEspeciales,
-  getRanking, calcularYGuardarPuntos,
+  getRanking, calcularYGuardarPuntos, recalcularTodosLosPuntos,
   getConfig, setConfig,
   getFechasGrupos, guardarFechasGrupos,
   guardarResultadoGrupo, getResultadosGrupos,
@@ -364,7 +364,6 @@ function renderGrupos() {
       })
       toast('✓ Marcador guardado')
       actualizarProgresoGrupos()
-      await calcularYGuardarPuntos(user.id)
     } catch (e) { toast('Error guardando: ' + e.message, 'err') }
   }
 }
@@ -467,7 +466,6 @@ async function renderEliminacion() {
         prediccionesKO = await getPrediccionesKO(user.id)
         el.style.borderColor = 'var(--success)'
         setTimeout(() => el.style.borderColor = '', 1500)
-        await calcularYGuardarPuntos(user.id)
       } catch (e) { toast('Error: ' + e.message, 'err') }
     }
   }
@@ -569,7 +567,6 @@ function renderEspeciales() {
       await guardarEspeciales(user.id, espPending.campeon || null, espPending.subcampeon || null, espPending.goleador || null)
       especiales = await getEspeciales(user.id)
       toast('✓ Guardado')
-      await calcularYGuardarPuntos(user.id)
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -810,7 +807,9 @@ async function renderAdmin() {
     if (s1 === '' || s2 === '') { toast('Ingresa ambos marcadores', 'err'); return }
     try {
       await guardarResultadoGrupo(grupo, idx, e1, e2, s1, s2)
-      toast(`✓ Resultado Grupo ${grupo} P${idx + 1} guardado`)
+      toast('✓ Resultado guardado, recalculando puntos...')
+      await recalcularTodosLosPuntos()
+      toast(`✓ Grupo ${grupo} P${idx + 1}: puntos actualizados`)
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -826,7 +825,13 @@ async function renderAdmin() {
     try {
       await guardarResultadoKO(ronda, idx, t1, t2, s1 || 0, s2 || 0, jugado)
       resultadosKO = await getResultadosKO()
-      toast(jugado ? '✓ Resultado guardado (cuenta para puntos)' : '✓ Enfrentamiento guardado (abierto para predicciones)')
+      if (jugado) {
+        toast('✓ Resultado guardado, recalculando puntos...')
+        await recalcularTodosLosPuntos()
+        toast('✓ Puntos actualizados')
+      } else {
+        toast('✓ Enfrentamiento guardado (abierto para predicciones)')
+      }
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
@@ -850,17 +855,16 @@ async function renderAdmin() {
     if (!c || !s || !g) { toast('Selecciona los 3 resultados', 'err'); return }
     try {
       await guardarResultadosEspeciales(c, s, g)
-      toast('✓ Resultados finales guardados')
+      toast('✓ Guardado, recalculando puntos...')
+      await recalcularTodosLosPuntos()
+      toast('✓ Resultados finales y puntos actualizados')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }
 
   window.recalcularTodos = async () => {
     toast('Recalculando puntos...')
     try {
-      const { data: todos } = await supabase.from('participantes').select('id')
-      for (const p of todos || []) {
-        await calcularYGuardarPuntos(p.id)
-      }
+      await recalcularTodosLosPuntos()
       toast('✓ Puntos actualizados para todos')
     } catch (e) { toast('Error: ' + e.message, 'err') }
   }

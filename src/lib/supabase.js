@@ -231,6 +231,13 @@ export async function getRanking() {
   return data || []
 }
 
+// Recalcula los puntos de TODOS los participantes de una sola vez, en el servidor.
+// Se llama cuando el admin carga un resultado. Es liviano: una sola operacion.
+export async function recalcularTodosLosPuntos() {
+  const { error } = await supabase.rpc('recalcular_puntos')
+  if (error) throw error
+}
+
 export async function calcularYGuardarPuntos(participante_id) {
   const [predGrupos, predKO, predEsp, resGrupos, resEsp] = await Promise.all([
     getPrediccionesGrupos(participante_id),
