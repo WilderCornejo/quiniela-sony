@@ -32,90 +32,90 @@ export function getPartidosGrupo(grupo) {
 //   idx0: 0-1 | idx1: 0-2 | idx2: 0-3 | idx3: 1-2 | idx4: 1-3 | idx5: 2-3
 // Estas fechas se pueden corregir desde el Panel de Administrador.
 export const FECHAS_GRUPOS_DEFAULT = {
-  // GRUPO A: México, Sudáfrica, Corea, Chequia
-  'A_0': '2026-06-11T16:00', // MEX-SUD
-  'A_1': '2026-06-18T22:00', // MEX-COR
-  'A_2': '2026-06-24T22:00', // MEX-CHE
-  'A_3': '2026-06-24T22:00', // SUD-COR
-  'A_4': '2026-06-18T13:00', // SUD-CHE
-  'A_5': '2026-06-11T23:00', // COR-CHE
-  // GRUPO B: Canadá, Bosnia, Catar, Suiza
-  'B_0': '2026-06-12T16:00', // CAN-BOS
-  'B_1': '2026-06-18T19:00', // CAN-QAT
-  'B_2': '2026-06-24T16:00', // CAN-SUI
-  'B_3': '2026-06-24T16:00', // BOS-QAT
-  'B_4': '2026-06-18T16:00', // BOS-SUI
-  'B_5': '2026-06-12T16:00', // QAT-SUI
+  // GRUPO A: México, Sudáfrica, Corea del Sur, República Checa
+  'A_0': '2026-06-11T13:00', // México vs Sudáfrica
+  'A_1': '2026-06-18T19:00', // México vs Corea del Sur
+  'A_2': '2026-06-24T19:00', // México vs República Checa
+  'A_3': '2026-06-24T19:00', // Sudáfrica vs Corea del Sur
+  'A_4': '2026-06-18T10:00', // Sudáfrica vs República Checa
+  'A_5': '2026-06-11T20:00', // Corea del Sur vs República Checa
+  // GRUPO B: Canadá, Bosnia y Herzegovina, Catar, Suiza
+  'B_0': '2026-06-12T13:00', // Canadá vs Bosnia y Herzegovina
+  'B_1': '2026-06-18T16:00', // Canadá vs Catar
+  'B_2': '2026-06-24T13:00', // Canadá vs Suiza
+  'B_3': '2026-06-24T13:00', // Bosnia y Herzegovina vs Catar
+  'B_4': '2026-06-18T13:00', // Bosnia y Herzegovina vs Suiza
+  'B_5': '2026-06-13T13:00', // Catar vs Suiza
   // GRUPO C: Brasil, Marruecos, Haití, Escocia
-  'C_0': '2026-06-13T19:00', // BRA-MAR
-  'C_1': '2026-06-19T22:00', // BRA-HAI
-  'C_2': '2026-06-24T19:00', // BRA-ESC
-  'C_3': '2026-06-24T19:00', // MAR-HAI
-  'C_4': '2026-06-19T19:00', // MAR-ESC
-  'C_5': '2026-06-13T22:00', // HAI-ESC
-  // GRUPO D: USA, Paraguay, Australia, Turquía
-  'D_0': '2026-06-12T22:00', // USA-PAR
-  'D_1': '2026-06-19T16:00', // USA-AUS
-  'D_2': '2026-06-25T23:00', // USA-TUR
-  'D_3': '2026-06-25T23:00', // PAR-AUS
-  'D_4': '2026-06-19T00:00', // PAR-TUR
-  'D_5': '2026-06-14T01:00', // AUS-TUR
+  'C_0': '2026-06-13T16:00', // Brasil vs Marruecos
+  'C_1': '2026-06-19T18:30', // Brasil vs Haití
+  'C_2': '2026-06-24T16:00', // Brasil vs Escocia
+  'C_3': '2026-06-24T16:00', // Marruecos vs Haití
+  'C_4': '2026-06-19T16:00', // Marruecos vs Escocia
+  'C_5': '2026-06-13T19:00', // Haití vs Escocia
+  // GRUPO D: Estados Unidos, Paraguay, Australia, Turquía
+  'D_0': '2026-06-12T19:00', // Estados Unidos vs Paraguay
+  'D_1': '2026-06-19T13:00', // Estados Unidos vs Australia
+  'D_2': '2026-06-25T20:00', // Estados Unidos vs Turquía
+  'D_3': '2026-06-25T20:00', // Paraguay vs Australia
+  'D_4': '2026-06-19T21:00', // Paraguay vs Turquía
+  'D_5': '2026-06-13T22:00', // Australia vs Turquía
   // GRUPO E: Alemania, Curazao, Costa de Marfil, Ecuador
-  'E_0': '2026-06-14T14:00', // ALE-CUR
-  'E_1': '2026-06-20T17:00', // ALE-COS
-  'E_2': '2026-06-25T17:00', // ALE-ECU
-  'E_3': '2026-06-25T17:00', // CUR-COS
-  'E_4': '2026-06-20T21:00', // CUR-ECU
-  'E_5': '2026-06-14T20:00', // COS-ECU
-  // GRUPO F: Países Bajos, Japón, Suecia, Túnez
-  'F_0': '2026-06-14T17:00', // PBA-JAP
-  'F_1': '2026-06-20T14:00', // PBA-SUE
-  'F_2': '2026-06-25T20:00', // PBA-TUN
-  'F_3': '2026-06-25T20:00', // JAP-SUE
-  'F_4': '2026-06-21T01:00', // JAP-TUN
-  'F_5': '2026-06-14T23:00', // SUE-TUN
+  'E_0': '2026-06-14T11:00', // Alemania vs Curazao
+  'E_1': '2026-06-20T14:00', // Alemania vs Costa de Marfil
+  'E_2': '2026-06-25T14:00', // Alemania vs Ecuador
+  'E_3': '2026-06-25T14:00', // Curazao vs Costa de Marfil
+  'E_4': '2026-06-20T18:00', // Curazao vs Ecuador
+  'E_5': '2026-06-14T17:00', // Costa de Marfil vs Ecuador
+  // GRUPO F: Países Bajos, Japón, Túnez, Suecia
+  'F_0': '2026-06-14T14:00', // Países Bajos vs Japón
+  'F_1': '2026-06-25T17:00', // Países Bajos vs Túnez
+  'F_2': '2026-06-20T11:00', // Países Bajos vs Suecia
+  'F_3': '2026-06-20T22:00', // Japón vs Túnez
+  'F_4': '2026-06-25T17:00', // Japón vs Suecia
+  'F_5': '2026-06-14T20:00', // Túnez vs Suecia
   // GRUPO G: Bélgica, Egipto, Irán, Nueva Zelanda
-  'G_0': '2026-06-15T16:00', // BEL-EGI
-  'G_1': '2026-06-21T16:00', // BEL-IRA
-  'G_2': '2026-06-27T00:00', // BEL-NZE
-  'G_3': '2026-06-27T00:00', // EGI-IRA
-  'G_4': '2026-06-21T22:00', // EGI-NZE
-  'G_5': '2026-06-15T22:00', // IRA-NZE
+  'G_0': '2026-06-15T13:00', // Bélgica vs Egipto
+  'G_1': '2026-06-21T13:00', // Bélgica vs Irán
+  'G_2': '2026-06-26T21:00', // Bélgica vs Nueva Zelanda
+  'G_3': '2026-06-26T21:00', // Egipto vs Irán
+  'G_4': '2026-06-21T19:00', // Egipto vs Nueva Zelanda
+  'G_5': '2026-06-15T19:00', // Irán vs Nueva Zelanda
   // GRUPO H: España, Cabo Verde, Arabia Saudí, Uruguay
-  'H_0': '2026-06-15T13:00', // ESP-CVE
-  'H_1': '2026-06-21T13:00', // ESP-SAU
-  'H_2': '2026-06-26T21:00', // ESP-URU
-  'H_3': '2026-06-26T21:00', // CVE-SAU
-  'H_4': '2026-06-21T19:00', // CVE-URU
-  'H_5': '2026-06-15T19:00', // SAU-URU
+  'H_0': '2026-06-15T10:00', // España vs Cabo Verde
+  'H_1': '2026-06-21T10:00', // España vs Arabia Saudí
+  'H_2': '2026-06-26T18:00', // España vs Uruguay
+  'H_3': '2026-06-26T18:00', // Cabo Verde vs Arabia Saudí
+  'H_4': '2026-06-21T16:00', // Cabo Verde vs Uruguay
+  'H_5': '2026-06-15T16:00', // Arabia Saudí vs Uruguay
   // GRUPO I: Francia, Senegal, Irak, Noruega
-  'I_0': '2026-06-16T16:00', // FRA-SEN
-  'I_1': '2026-06-22T19:00', // FRA-IRA
-  'I_2': '2026-06-26T16:00', // FRA-NOR
-  'I_3': '2026-06-26T16:00', // SEN-IRA
-  'I_4': '2026-06-22T16:00', // SEN-NOR
-  'I_5': '2026-06-16T19:00', // IRA-NOR
+  'I_0': '2026-06-16T13:00', // Francia vs Senegal
+  'I_1': '2026-06-22T15:00', // Francia vs Irak
+  'I_2': '2026-06-26T13:00', // Francia vs Noruega
+  'I_3': '2026-06-26T13:00', // Senegal vs Irak
+  'I_4': '2026-06-22T18:00', // Senegal vs Noruega
+  'I_5': '2026-06-16T16:00', // Irak vs Noruega
   // GRUPO J: Argentina, Argelia, Jordania, Austria
-  'J_0': '2026-06-16T22:00', // ARG-AGL
-  'J_1': '2026-06-23T00:00', // ARG-JOR
-  'J_2': '2026-06-22T14:00', // ARG-AUS
-  'J_3': '2026-06-23T00:00', // AGL-JOR
-  'J_4': '2026-06-27T20:30', // AGL-AUS
-  'J_5': '2026-06-17T01:00', // JOR-AUS
-  // GRUPO K: Portugal, RD Congo, Uzbekistán, Colombia
-  'K_0': '2026-06-17T14:00', // POR-CON
-  'K_1': '2026-06-23T14:00', // POR-UZB
-  'K_2': '2026-06-27T20:30', // POR-COL
-  'K_3': '2026-06-23T23:00', // CON-UZB
-  'K_4': '2026-06-23T23:00', // CON-COL
-  'K_5': '2026-06-17T23:00', // UZB-COL
-  // GRUPO L: Inglaterra, Croacia, Ghana, Panamá
-  'L_0': '2026-06-17T17:00', // ING-CRO
-  'L_1': '2026-06-23T20:00', // ING-GHA
-  'L_2': '2026-06-27T18:00', // ING-PAN
-  'L_3': '2026-06-23T20:00', // CRO-GHA
-  'L_4': '2026-06-22T20:00', // CRO-PAN
-  'L_5': '2026-06-17T20:00', // GHA-PAN
+  'J_0': '2026-06-16T19:00', // Argentina vs Argelia
+  'J_1': '2026-06-27T20:00', // Argentina vs Jordania
+  'J_2': '2026-06-22T11:00', // Argentina vs Austria
+  'J_3': '2026-06-22T21:00', // Argelia vs Jordania
+  'J_4': '2026-06-27T20:00', // Argelia vs Austria
+  'J_5': '2026-06-16T22:00', // Jordania vs Austria
+  // GRUPO K: Portugal, R.D. del Congo, Uzbekistán, Colombia
+  'K_0': '2026-06-17T11:00', // Portugal vs R.D. del Congo
+  'K_1': '2026-06-23T11:00', // Portugal vs Uzbekistán
+  'K_2': '2026-06-27T17:30', // Portugal vs Colombia
+  'K_3': '2026-06-27T17:30', // R.D. del Congo vs Uzbekistán
+  'K_4': '2026-06-23T20:00', // R.D. del Congo vs Colombia
+  'K_5': '2026-06-17T20:00', // Uzbekistán vs Colombia
+  // GRUPO L: Inglaterra, Croacia, Panamá, Ghana
+  'L_0': '2026-06-17T14:00', // Inglaterra vs Croacia
+  'L_1': '2026-06-27T15:00', // Inglaterra vs Panamá
+  'L_2': '2026-06-23T14:00', // Inglaterra vs Ghana
+  'L_3': '2026-06-23T17:00', // Croacia vs Panamá
+  'L_4': '2026-06-27T15:00', // Croacia vs Ghana
+  'L_5': '2026-06-17T17:00', // Panamá vs Ghana
 }
 
 // ── CUADRO OFICIAL DE ELIMINACIÓN — Mundial 2026 ──
