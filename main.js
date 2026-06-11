@@ -74,7 +74,7 @@ function toast(msg, tipo = 'ok') {
 }
 
 // ── GRÁFICOS ORIGINALES DEL HERO (trofeo + emblema, sin marcas registradas) ──
-const TROFEO_SVG = `<svg viewBox="0 0 64 84" width="50" height="66" xmlns="http://www.w3.org/2000/svg" aria-label="Trofeo">
+const TROFEO_SVG = `<svg viewBox="0 0 64 84" width="96" height="126" xmlns="http://www.w3.org/2000/svg" aria-label="Trofeo">
   <defs>
     <linearGradient id="trGold" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FFE89A"/><stop offset=".5" stop-color="#F5C04E"/><stop offset="1" stop-color="#B8810F"/>
@@ -90,7 +90,7 @@ const TROFEO_SVG = `<svg viewBox="0 0 64 84" width="50" height="66" xmlns="http:
   </g>
   <path d="M32 22 l2.1 4.6 5 .5 -3.8 3.4 1.1 4.9 -4.4 -2.6 -4.4 2.6 1.1 -4.9 -3.8 -3.4 5 -.5 Z" fill="#fff8e1" opacity=".92"/>
 </svg>`
-const EMBLEMA_SVG = `<svg viewBox="0 0 72 86" width="52" height="62" xmlns="http://www.w3.org/2000/svg" aria-label="Mundial 2026">
+const EMBLEMA_SVG = `<svg viewBox="0 0 72 86" width="100" height="119" xmlns="http://www.w3.org/2000/svg" aria-label="Mundial 2026">
   <defs>
     <radialGradient id="emBall" cx=".38" cy=".34" r=".75">
       <stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#dfefff"/><stop offset="1" stop-color="#8fb8d6"/>
@@ -112,12 +112,12 @@ function renderAuth() {
     <div class="hero">
       <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
-      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;">
+      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;">
         <span class="hero-flank">${TROFEO_SVG}</span>
         <h1 style="margin:0;">QUINIELA<br><em>MUNDIAL</em> 2026</h1>
         <span class="hero-flank">${EMBLEMA_SVG}</span>
       </div>
-      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:400px){.hero-flank svg{transform:scale(.72)}}</style>
+      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:480px){.hero-flank svg{transform:scale(.85)}}</style>
       <div class="hero-sub">${textoSedes()}</div>
       <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
         <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
@@ -251,12 +251,12 @@ function renderApp() {
     <div class="hero">
       <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
-      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;">
+      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;">
         <span class="hero-flank">${TROFEO_SVG}</span>
         <h1 style="margin:0;">QUINIELA<br><em>MUNDIAL</em> 2026</h1>
         <span class="hero-flank">${EMBLEMA_SVG}</span>
       </div>
-      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:400px){.hero-flank svg{transform:scale(.72)}}</style>
+      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:480px){.hero-flank svg{transform:scale(.85)}}</style>
       <div class="hero-sub">${textoSedes()}</div>
       <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
         <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
