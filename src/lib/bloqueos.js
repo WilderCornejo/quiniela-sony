@@ -22,28 +22,13 @@ export function partidoBloqueado(fechaISO, ahora = new Date()) {
   return ahora >= f
 }
 
-// Calcula cuándo termina la PRIMERA RONDA de la fase de grupos:
-// el momento del primer partido más tardío entre los 12 grupos.
-// (El "primer partido" de cada grupo es el de fecha más temprana de ese grupo.)
-export function fechaCierreEliminacion(fechasGrupos) {
-  const grupos = 'ABCDEFGHIJKL'.split('')
-  let masTardio = null
+// ── FECHA LÍMITE PARA LAS PREDICCIONES ESPECIALES ──
+// (Campeón, Subcampeón y Goleador.) Hora de Costa Rica. Editable aquí en un solo lugar.
+export const CIERRE_ESPECIALES = '2026-06-22T12:00'
 
-  for (const g of grupos) {
-    // fechas de los 6 partidos del grupo
-    const fechasGrupo = []
-    for (let i = 0; i < 6; i++) {
-      const iso = fechasGrupos[`${g}_${i}`]
-      const f = fechaCR(iso)
-      if (f && !isNaN(f.getTime())) fechasGrupo.push(f)
-    }
-    if (!fechasGrupo.length) continue
-    // el primer partido de este grupo = la fecha más temprana
-    const primerPartido = new Date(Math.min(...fechasGrupo.map(d => d.getTime())))
-    // guardamos el más tardío de todos los "primeros partidos"
-    if (!masTardio || primerPartido > masTardio) masTardio = primerPartido
-  }
-  return masTardio
+// Devuelve la fecha de cierre de Especiales (fija).
+export function fechaCierreEliminacion(fechasGrupos) {
+  return fechaCR(CIERRE_ESPECIALES)
 }
 
 // ¿Ya está cerrada la fase de Eliminación y Especiales?

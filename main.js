@@ -282,6 +282,12 @@ function renderApp() {
       `).join('')}
     </nav>
 
+    ${!eliminacionBloqueada(fechasGrupos) ? `
+    <div onclick="showPage('especiales')" style="cursor:pointer;max-width:760px;margin:0 auto 6px;padding:12px 16px;border:1px solid rgba(0,229,255,0.4);border-radius:10px;background:linear-gradient(90deg,rgba(0,229,255,0.10),rgba(245,192,78,0.08));display:flex;align-items:center;gap:10px;">
+      <i class="ti ti-star" style="color:#F5C04E;font-size:20px;flex-shrink:0;"></i>
+      <span style="font-size:13px;line-height:1.4;color:var(--text,#eaf6ff);">Recuerda llenar los <strong>Especiales</strong> antes del <strong>22 de junio a las 12:00</strong>: Campeón, Subcampeón y Goleador.</span>
+    </div>` : ''}
+
     <div id="page-grupos" class="page active"></div>
     <div id="page-eliminacion" class="page"></div>
     <div id="page-especiales" class="page"></div>
@@ -542,7 +548,7 @@ function renderEspeciales() {
       ${bloqueado
         ? `<div class="aviso-bloqueo">
              <i class="ti ti-lock"></i>
-             Esta fase ya está cerrada. Se cerró al terminar la primera ronda de grupos.
+             Esta fase ya está cerrada. El plazo venció el 22 de junio a las 12:00.
            </div>`
         : `<div class="aviso-cierre">
              <i class="ti ti-clock"></i>
@@ -716,7 +722,7 @@ async function renderAdmin() {
       </p>
       <div class="aviso-cierre" style="margin-bottom:14px;">
         <i class="ti ti-clock"></i>
-        Eliminación y Especiales se cierran: <strong>${textoCierre(fechasGrupos)}</strong>
+        Las predicciones Especiales se cierran: <strong>${textoCierre(fechasGrupos)}</strong>
       </div>
       <div id="fechas-editor">
         ${GRUPOS.map(g => {
