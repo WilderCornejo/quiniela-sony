@@ -31,6 +31,7 @@ let prediccionesKO = []
 let especiales = null
 let fechasGrupos = {}
 let resultadosKO = []   // enfrentamientos de eliminatoria definidos por el admin
+let resultadosGrupos = []   // resultados reales de grupos cargados por el admin
 
 // Mapa nombre de equipo -> codigo de pais (los grupos tienen todos los equipos con su codigo)
 const NOMBRE_A_CODIGO = {}
@@ -689,6 +690,7 @@ async function renderAdmin() {
   if (!cont) return
 
   resultadosKO = await getResultadosKO()
+  resultadosGrupos = await getResultadosGrupos()
 
   cont.innerHTML = `
     <div class="card fade-up">
@@ -749,10 +751,10 @@ async function renderAdmin() {
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                 <span style="font-size:13px;flex:1;display:flex;align-items:center;gap:5px;"><img src="${flagUrl(e1.c)}" alt="${e1.n}" onerror="this.style.display='none'" style="width:22px;height:15px;border-radius:2px;" />${e1.n}</span>
                 <input class="score-inp" type="number" min="0" max="20" placeholder="-"
-                  id="rg_${g.letra}_${idx}_s1" style="width:36px;" />
+                  id="rg_${g.letra}_${idx}_s1" value="${(resultadosGrupos.find(r => r.grupo === g.letra && r.partido_idx === idx) || {}).goles1 ?? ''}" style="width:36px;" />
                 <span style="color:var(--text-dim);">:</span>
                 <input class="score-inp" type="number" min="0" max="20" placeholder="-"
-                  id="rg_${g.letra}_${idx}_s2" style="width:36px;" />
+                  id="rg_${g.letra}_${idx}_s2" value="${(resultadosGrupos.find(r => r.grupo === g.letra && r.partido_idx === idx) || {}).goles2 ?? ''}" style="width:36px;" />
                 <span style="font-size:13px;flex:1;text-align:right;display:flex;align-items:center;justify-content:flex-end;gap:5px;">${e2.n}<img src="${flagUrl(e2.c)}" alt="${e2.n}" onerror="this.style.display='none'" style="width:22px;height:15px;border-radius:2px;" /></span>
                 <button class="btn sm success" onclick="saveResGrupo('${g.letra}',${idx},'${e1.n}','${e2.n}')">
                   <i class="ti ti-check"></i>
