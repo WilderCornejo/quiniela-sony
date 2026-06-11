@@ -73,13 +73,51 @@ function toast(msg, tipo = 'ok') {
   el._t = setTimeout(() => el.classList.remove('show'), 2800)
 }
 
+// ── GRÁFICOS ORIGINALES DEL HERO (trofeo + emblema, sin marcas registradas) ──
+const TROFEO_SVG = `<svg viewBox="0 0 64 84" width="50" height="66" xmlns="http://www.w3.org/2000/svg" aria-label="Trofeo">
+  <defs>
+    <linearGradient id="trGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE89A"/><stop offset=".5" stop-color="#F5C04E"/><stop offset="1" stop-color="#B8810F"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#trGold)" stroke="#7a5408" stroke-width=".8">
+    <path d="M14 18 C4 18 4 34 16 34 L16 29 C10 29 10 23 16 23 Z"/>
+    <path d="M50 18 C60 18 60 34 48 34 L48 29 C54 29 54 23 48 23 Z"/>
+    <path d="M16 14 H48 V26 C48 40 40 48 32 48 C24 48 16 40 16 26 Z"/>
+    <rect x="29" y="48" width="6" height="10"/>
+    <rect x="22" y="58" width="20" height="5" rx="1.5"/>
+    <rect x="18" y="63" width="28" height="6" rx="2"/>
+  </g>
+  <path d="M32 22 l2.1 4.6 5 .5 -3.8 3.4 1.1 4.9 -4.4 -2.6 -4.4 2.6 1.1 -4.9 -3.8 -3.4 5 -.5 Z" fill="#fff8e1" opacity=".92"/>
+</svg>`
+const EMBLEMA_SVG = `<svg viewBox="0 0 72 86" width="52" height="62" xmlns="http://www.w3.org/2000/svg" aria-label="Mundial 2026">
+  <defs>
+    <radialGradient id="emBall" cx=".38" cy=".34" r=".75">
+      <stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#dfefff"/><stop offset="1" stop-color="#8fb8d6"/>
+    </radialGradient>
+  </defs>
+  <circle cx="36" cy="27" r="22" fill="url(#emBall)" stroke="#00e5ff" stroke-width="1.4"/>
+  <path d="M36 16 l8.5 6.2 -3.2 10 H30.7 L27.5 22.2 Z" fill="#0b1f2a"/>
+  <path d="M36 5 V16 M15 24 L27.5 22.2 M57 24 L44.5 22.2 M23 46 L30.7 32.2 M49 46 L41.3 32.2" stroke="#0b1f2a" stroke-width="1.1" fill="none" opacity=".5"/>
+  <circle cx="24" cy="53" r="3.3" fill="#3c3b6e" stroke="#fff" stroke-width=".6"/>
+  <circle cx="36" cy="53" r="3.3" fill="#006847" stroke="#fff" stroke-width=".6"/>
+  <circle cx="48" cy="53" r="3.3" fill="#d52b1e" stroke="#fff" stroke-width=".6"/>
+  <rect x="14" y="61" width="44" height="18" rx="4" fill="#0b1f2a" stroke="#00e5ff" stroke-width="1.2"/>
+  <text x="36" y="73.5" text-anchor="middle" font-family="Orbitron, sans-serif" font-weight="700" font-size="11" fill="#00e5ff" letter-spacing="1.5">2026</text>
+</svg>`
+
 // ── AUTH PAGE ─────────────────────────────────────────
 function renderAuth() {
   document.getElementById('app').innerHTML = `
     <div class="hero">
       <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
-      <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
+      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;">
+        <span class="hero-flank">${TROFEO_SVG}</span>
+        <h1 style="margin:0;">QUINIELA<br><em>MUNDIAL</em> 2026</h1>
+        <span class="hero-flank">${EMBLEMA_SVG}</span>
+      </div>
+      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:400px){.hero-flank svg{transform:scale(.72)}}</style>
       <div class="hero-sub">${textoSedes()}</div>
       <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
         <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
@@ -213,7 +251,12 @@ function renderApp() {
     <div class="hero">
       <div id="ball-canvas" class="ball-canvas"></div>
       <div class="hero-badge">FIFA World Cup 2026</div>
-      <h1>QUINIELA<br><em>MUNDIAL</em> 2026</h1>
+      <div class="hero-title-row" style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:nowrap;">
+        <span class="hero-flank">${TROFEO_SVG}</span>
+        <h1 style="margin:0;">QUINIELA<br><em>MUNDIAL</em> 2026</h1>
+        <span class="hero-flank">${EMBLEMA_SVG}</span>
+      </div>
+      <style>.hero-flank svg{display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.3))}@media(max-width:400px){.hero-flank svg{transform:scale(.72)}}</style>
       <div class="hero-sub">${textoSedes()}</div>
       <div class="ais-band" style="overflow:hidden;white-space:nowrap;width:100%;max-width:480px;margin:16px auto 0;padding:8px 0;border-top:1px solid rgba(0,229,255,0.25);border-bottom:1px solid rgba(0,229,255,0.25);background:linear-gradient(90deg,transparent,rgba(0,229,255,0.10),transparent);border-radius:4px;">
         <div style="display:inline-flex;white-space:nowrap;animation:aisMarquee 18s linear infinite;will-change:transform;">
