@@ -326,6 +326,31 @@ function getPredGrupo(grupo, idx) {
   return prediccionesGrupos.find(p => p.grupo === grupo && p.partido_idx === idx)
 }
 
+// Helpers de fecha en hora de Costa Rica para la vista por día
+function _fechaCRDate(iso) {
+  if (!iso) return null
+  let s = iso.trim()
+  if (s.length === 16) s += ':00'
+  const d = new Date(s + '-06:00')
+  return isNaN(d.getTime()) ? null : d
+}
+function _diaLabel(iso) {
+  const d = _fechaCRDate(iso)
+  if (!d) return 'Sin fecha'
+  const s = d.toLocaleDateString('es-CR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'America/Costa_Rica' })
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+function _horaLabel(iso) {
+  const d = _fechaCRDate(iso)
+  if (!d) return ''
+  return d.toLocaleTimeString('es-CR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Costa_Rica' })
+}
+function _diaKey(iso) {
+  const d = _fechaCRDate(iso)
+  if (!d) return '9999-99-99'
+  return d.toLocaleDateString('en-CA', { timeZone: 'America/Costa_Rica' })
+}
+
 function renderGrupos() {
   const editable = !torneoIniciado
   const cont = document.getElementById('page-grupos')
@@ -334,6 +359,24 @@ function renderGrupos() {
   const totalPartidos = GRUPOS.reduce((s, g) => s + getPartidosGrupo(g).length, 0)
   const completados = prediccionesGrupos.filter(p => p.goles1 !== null && p.goles2 !== null).length
   const pct = Math.round((completados / totalPartidos) * 100)
+
+  // Todos los partidos ordenados por día y hora (Costa Rica)
+  const _todos = []
+  GRUPOS.forEach(g => {
+    getPartidosGrupo(g).forEach(({ e1, e2, idx }) => {
+      const fechaISO = fechasGrupos[`${g.letra}_${idx}`]
+      const dt = _fechaCRDate(fechaISO)
+      _todos.push({ letra: g.letra, idx, e1, e2, fechaISO, t: dt ? dt.getTime() : Infinity })
+    })
+  })
+  _todos.sort((a, b) => a.t - b.t)
+  const dias = []
+  const _mapDia = {}
+  _todos.forEach(m => {
+    const k = _diaKey(m.fechaISO)
+    if (!_mapDia[k]) { _mapDia[k] = { label: _diaLabel(m.fechaISO), partidos: [] }; dias.push(_mapDia[k]) }
+    _mapDia[k].partidos.push(m)
+  })
 
   cont.innerHTML = `
     <div class="card fade-up">
@@ -353,45 +396,38 @@ function renderGrupos() {
       <div class="progress-bar"><div id="progreso-fill" class="progress-fill" style="width:${pct}%"></div></div>
     </div>
 
-    <div class="groups-grid">
-      ${GRUPOS.map(g => {
-        const partidos = getPartidosGrupo(g)
-        return `<div class="group-card fade-up">
-          <div class="group-header">
-            <span class="group-letter">G${g.letra}</span>
-            <span class="group-sub">GRUPO ${g.letra}</span>
-          </div>
-          ${partidos.map(({ e1, e2, idx }) => {
-            const pred = getPredGrupo(g.letra, idx)
-            const fechaISO = fechasGrupos[`${g.letra}_${idx}`]
-            const bloqueado = partidoBloqueado(fechaISO)
-            return `<div class="match-row ${bloqueado ? 'match-locked' : ''}">
-              <span class="team">
-                <img class="flag" src="${flagUrl(e1.c)}" alt="${e1.n}" loading="lazy" />
-                ${e1.n}
-              </span>
-              <div class="score-box">
-                <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
-                  ${bloqueado ? 'disabled' : ''}
-                  onchange="saveGrupo('${g.letra}',${idx},'${e1.n}','${e2.n}',this,'s1')" data-g="${g.letra}" data-i="${idx}" data-f="s1" />
-                <span class="score-sep">:</span>
-                <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
-                  ${bloqueado ? 'disabled' : ''}
-                  onchange="saveGrupo('${g.letra}',${idx},'${e1.n}','${e2.n}',this,'s2')" data-g="${g.letra}" data-i="${idx}" data-f="s2" />
-              </div>
-              <span class="team r">
-                ${e2.n}
-                <img class="flag" src="${flagUrl(e2.c)}" alt="${e2.n}" loading="lazy" />
-              </span>
-              <div class="match-fecha">
-                ${bloqueado
-                  ? '<i class="ti ti-lock"></i> Cerrado · ' + formatoFechaPartido(fechaISO)
-                  : '<i class="ti ti-clock"></i> ' + formatoFechaPartido(fechaISO)}
-              </div>
-            </div>`
-          }).join('')}
-        </div>`
-      }).join('')}
+    <div class="dias-lista">
+      ${dias.map(dia => `
+        <div style="margin:18px 0 8px;padding:9px 14px;background:linear-gradient(90deg,rgba(0,229,255,0.13),transparent);border-left:3px solid #00e5ff;border-radius:6px;font-weight:700;font-size:15px;color:var(--text,#eaf6ff);">
+          <i class="ti ti-calendar-event" style="color:#00e5ff;"></i> ${dia.label}
+        </div>
+        ${dia.partidos.map(({ letra, idx, e1, e2, fechaISO }) => {
+          const pred = getPredGrupo(letra, idx)
+          const bloqueado = partidoBloqueado(fechaISO)
+          return `<div class="match-row ${bloqueado ? 'match-locked' : ''}">
+            <span class="team">
+              <img class="flag" src="${flagUrl(e1.c)}" alt="${e1.n}" loading="lazy" />
+              ${e1.n}
+            </span>
+            <div class="score-box">
+              <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles1 ?? ''}" placeholder="-"
+                ${bloqueado ? 'disabled' : ''}
+                onchange="saveGrupo('${letra}',${idx},'${e1.n}','${e2.n}',this,'s1')" data-g="${letra}" data-i="${idx}" data-f="s1" />
+              <span class="score-sep">:</span>
+              <input class="score-inp" type="number" min="0" max="20" value="${pred?.goles2 ?? ''}" placeholder="-"
+                ${bloqueado ? 'disabled' : ''}
+                onchange="saveGrupo('${letra}',${idx},'${e1.n}','${e2.n}',this,'s2')" data-g="${letra}" data-i="${idx}" data-f="s2" />
+            </div>
+            <span class="team r">
+              ${e2.n}
+              <img class="flag" src="${flagUrl(e2.c)}" alt="${e2.n}" loading="lazy" />
+            </span>
+            <div class="match-fecha">
+              ${bloqueado ? '<i class="ti ti-lock"></i> Cerrado · ' : '<i class="ti ti-clock"></i> '}${_horaLabel(fechaISO) || 'Por definir'} · Grupo ${letra}
+            </div>
+          </div>`
+        }).join('')}
+      `).join('')}
     </div>
   `
 
