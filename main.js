@@ -988,6 +988,11 @@ init()
 
 // ════════════════════════════════════════════════════════
 // PWA — instalación de la app + banner guía para el usuario
+// Cubre 4 casos:
+//  1) Navegador interno de Facebook/Instagram/WhatsApp/etc → guía "Abrir en Chrome/Safari" + botón Copiar link
+//  2) iPhone/iPad en Safari → guía "Compartir → Agregar a inicio"
+//  3) Android en Chrome → botón "Instalar" de un toque
+//  4) Ya instalada o aviso cerrado antes → no molestar
 // ════════════════════════════════════════════════════════
 ;(function initPWA() {
   // Metadatos (manifest, color de barra, ícono de iPhone)
@@ -1006,47 +1011,82 @@ init()
   if (yaInstalada) return
   if (localStorage.getItem('pwa_banner_oculto') === '1') return
 
-  const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const ua = navigator.userAgent || ''
+  const esIOS = /iphone|ipad|ipod/i.test(ua)
+  // Navegadores internos: Facebook (FBAN/FBAV/FB_IAB), Messenger, Instagram, WhatsApp, TikTok, Twitter/X, LinkedIn, Snapchat, Line
+  const esNavegadorInterno = /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Instagram|Messenger|WhatsApp|musical_ly|TikTok|BytedanceWebview|Twitter|LinkedInApp|Snapchat|Line\//i.test(ua)
   let promptGuardado = null
 
-  function mostrarBanner(mensajeHTML, conBoton) {
+  function mostrarBanner(mensajeHTML, tipoBoton) {
+    // tipoBoton: 'instalar' | 'copiar' | null
     if (document.getElementById('pwa-banner')) return
     const div = document.createElement('div')
     div.id = 'pwa-banner'
     div.style.cssText = 'position:fixed;left:10px;right:10px;bottom:12px;z-index:9999;background:#0d1726;border:1px solid rgba(0,229,255,.45);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.5);font-size:13px;color:#eaf6ff;max-width:560px;margin:0 auto;'
+    let botonHTML = ''
+    if (tipoBoton === 'instalar') botonHTML = '<button id="pwa-instalar" style="background:#00e5ff;color:#06121f;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;flex-shrink:0;">Instalar</button>'
+    if (tipoBoton === 'copiar') botonHTML = '<button id="pwa-copiar" style="background:#00e5ff;color:#06121f;border:none;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap;">Copiar link</button>'
     div.innerHTML = `
       <span style="font-size:22px;flex-shrink:0;">📲</span>
       <span style="flex:1;line-height:1.45;">${mensajeHTML}</span>
-      ${conBoton ? '<button id="pwa-instalar" style="background:#00e5ff;color:#06121f;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;flex-shrink:0;">Instalar</button>' : ''}
+      ${botonHTML}
       <button id="pwa-cerrar" aria-label="Cerrar" style="background:none;border:none;color:#7e93a8;font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>`
     document.body.appendChild(div)
     document.getElementById('pwa-cerrar').onclick = () => {
       div.remove()
       localStorage.setItem('pwa_banner_oculto', '1')
     }
-    const btn = document.getElementById('pwa-instalar')
-    if (btn) btn.onclick = async () => {
+    const btnInstalar = document.getElementById('pwa-instalar')
+    if (btnInstalar) btnInstalar.onclick = async () => {
       if (!promptGuardado) return
       promptGuardado.prompt()
       await promptGuardado.userChoice
       promptGuardado = null
       div.remove()
     }
+    const btnCopiar = document.getElementById('pwa-copiar')
+    if (btnCopiar) btnCopiar.onclick = async () => {
+      const url = location.origin + '/'
+      let copiado = false
+      try {
+        await navigator.clipboard.writeText(url)
+        copiado = true
+      } catch (e) {
+        // Plan B para navegadores internos viejos que bloquean el portapapeles moderno
+        try {
+          const ta = document.createElement('textarea')
+          ta.value = url
+          ta.style.cssText = 'position:fixed;opacity:0;'
+          document.body.appendChild(ta)
+          ta.select()
+          copiado = document.execCommand('copy')
+          ta.remove()
+        } catch (e2) { copiado = false }
+      }
+      btnCopiar.textContent = copiado ? '✓ Copiado' : url
+      btnCopiar.style.background = copiado ? '#19d27c' : '#00e5ff'
+    }
   }
 
-  if (esIOS) {
-    // iPhone/iPad: no existe botón de instalar; mostramos la guía
+  if (esNavegadorInterno) {
+    // Caso 1: el link se abrió dentro de Facebook, Instagram, WhatsApp, etc.
+    // Ese navegador interno NO permite instalar la app; guiamos a abrirla en el navegador real.
+    const guia = esIOS
+      ? 'Para instalar la <strong>Quiniela</strong>, toca los <strong>tres puntos (···)</strong> o el botón <strong>Compartir</strong> y elige <strong>"Abrir en Safari"</strong>. También puedes copiar el link y pegarlo en Safari.'
+      : 'Para instalar la <strong>Quiniela</strong>, toca los <strong>tres puntos (⋮)</strong> arriba a la derecha y elige <strong>"Abrir en Chrome"</strong>. También puedes copiar el link y pegarlo en Chrome.'
+    setTimeout(() => mostrarBanner(guia, 'copiar'), 2000)
+  } else if (esIOS) {
+    // Caso 2: iPhone/iPad en Safari — no existe botón de instalar; mostramos la guía
     setTimeout(() => mostrarBanner(
-      'Instala la <strong>Quiniela</strong> como app: toca el botón <strong>Compartir</strong> (el cuadrito con la flecha ↑) y elige <strong>“Agregar a inicio”</strong>.',
-      false
+      'Instala la <strong>Quiniela</strong> como app: toca el botón <strong>Compartir</strong> (el cuadrito con la flecha ↑) y elige <strong>"Agregar a inicio"</strong>.',
+      null
     ), 2500)
   } else {
-    // Android/Chrome: botón de instalación directo
+    // Caso 3: Android/Chrome — botón de instalación directo
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault()
       promptGuardado = e
-      mostrarBanner('Instala la <strong>Quiniela Mundial 2026</strong> en tu pantalla de inicio y entra con un solo toque.', true)
+      mostrarBanner('Instala la <strong>Quiniela Mundial 2026</strong> en tu pantalla de inicio y entra con un solo toque.', 'instalar')
     })
   }
 })()
-
