@@ -986,7 +986,67 @@ async function renderAdmin() {
 // ── START ─────────────────────────────────────────────
 init()
 
+// ════════════════════════════════════════════════════════
+// PWA — instalación de la app + banner guía para el usuario
+// ════════════════════════════════════════════════════════
+;(function initPWA() {
+  // Metadatos (manifest, color de barra, ícono de iPhone)
+  const add = (html) => document.head.insertAdjacentHTML('beforeend', html)
+  if (!document.querySelector('link[rel="manifest"]')) add('<link rel="manifest" href="/manifest.json">')
+  if (!document.querySelector('meta[name="theme-color"]')) add('<meta name="theme-color" content="#0a0e16">')
+  if (!document.querySelector('link[rel="apple-touch-icon"]')) add('<link rel="apple-touch-icon" href="/icons/icon-180.png">')
 
+  // Registrar el service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}))
+  }
 
+  // Si ya está instalada, o el usuario cerró el aviso antes, no molestar
+  const yaInstalada = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true
+  if (yaInstalada) return
+  if (localStorage.getItem('pwa_banner_oculto') === '1') return
 
+  const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  let promptGuardado = null
+
+  function mostrarBanner(mensajeHTML, conBoton) {
+    if (document.getElementById('pwa-banner')) return
+    const div = document.createElement('div')
+    div.id = 'pwa-banner'
+    div.style.cssText = 'position:fixed;left:10px;right:10px;bottom:12px;z-index:9999;background:#0d1726;border:1px solid rgba(0,229,255,.45);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 24px rgba(0,0,0,.5);font-size:13px;color:#eaf6ff;max-width:560px;margin:0 auto;'
+    div.innerHTML = `
+      <span style="font-size:22px;flex-shrink:0;">📲</span>
+      <span style="flex:1;line-height:1.45;">${mensajeHTML}</span>
+      ${conBoton ? '<button id="pwa-instalar" style="background:#00e5ff;color:#06121f;border:none;border-radius:8px;padding:9px 16px;font-weight:700;cursor:pointer;flex-shrink:0;">Instalar</button>' : ''}
+      <button id="pwa-cerrar" aria-label="Cerrar" style="background:none;border:none;color:#7e93a8;font-size:18px;cursor:pointer;padding:4px;flex-shrink:0;">✕</button>`
+    document.body.appendChild(div)
+    document.getElementById('pwa-cerrar').onclick = () => {
+      div.remove()
+      localStorage.setItem('pwa_banner_oculto', '1')
+    }
+    const btn = document.getElementById('pwa-instalar')
+    if (btn) btn.onclick = async () => {
+      if (!promptGuardado) return
+      promptGuardado.prompt()
+      await promptGuardado.userChoice
+      promptGuardado = null
+      div.remove()
+    }
+  }
+
+  if (esIOS) {
+    // iPhone/iPad: no existe botón de instalar; mostramos la guía
+    setTimeout(() => mostrarBanner(
+      'Instala la <strong>Quiniela</strong> como app: toca el botón <strong>Compartir</strong> (el cuadrito con la flecha ↑) y elige <strong>“Agregar a inicio”</strong>.',
+      false
+    ), 2500)
+  } else {
+    // Android/Chrome: botón de instalación directo
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault()
+      promptGuardado = e
+      mostrarBanner('Instala la <strong>Quiniela Mundial 2026</strong> en tu pantalla de inicio y entra con un solo toque.', true)
+    })
+  }
+})()
 
