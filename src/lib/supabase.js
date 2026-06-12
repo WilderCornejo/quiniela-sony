@@ -223,12 +223,12 @@ export async function getResultadosEspeciales() {
 
 // ── RANKING ───────────────────────────────────────────
 export async function getRanking() {
-  // Solo los 50 mejores: evita descargar miles de filas y sobrecargar
+  // Solo los 15 mejores: evita descargar miles de filas y sobrecargar
   const { data } = await supabase
     .from('puntos')
     .select('*, participantes(nombre)')
     .order('total', { ascending: false })
-    .limit(50)
+    .limit(15)
   return data || []
 }
 

@@ -646,7 +646,7 @@ async function renderRanking() {
     cont.innerHTML = `
       <div class="card fade-up">
         <div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div>
-        <p style="font-size:12px;color:var(--text-dim);margin:-4px 0 14px;"><i class="ti ti-info-circle"></i> Se muestran los 50 mejores rankeados.</p>
+        <p style="font-size:14px;color:var(--text-dim);margin:-4px 0 14px;"><i class="ti ti-info-circle"></i> Se muestran los 15 mejores rankeados.</p>
         <table class="rank-table">
           <thead><tr>
             <th>#</th>
