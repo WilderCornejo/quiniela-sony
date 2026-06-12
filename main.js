@@ -639,7 +639,7 @@ async function renderRanking() {
   try {
     const ranking = await getRanking()
     if (!ranking.length) {
-      cont.innerHTML = `<div class="card fade-up"><div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div><div class="empty"><i class="ti ti-users"></i>Aún no hay participantes con puntos</div></div>`
+      cont.innerHTML = `<div class="card fade-up"><div class="card-title"><i class="ti ti-podium"></i>Tabla de posiciones</div><div class="empty"><i class="ti ti-users"></i>Aún no hay participantes inscritos</div></div>`
       return
     }
 
@@ -663,7 +663,7 @@ async function renderRanking() {
               const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos
               return `<tr class="rank-row">
                 <td><span class="rank-pos ${cls}">${medal}</span></td>
-                <td style="font-weight:600;font-size:15px;">${r.participantes?.nombre || '—'}</td>
+                <td style="font-weight:600;font-size:15px;">${r.nombre || '—'}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_grupos}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_ko}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_especiales}</td>

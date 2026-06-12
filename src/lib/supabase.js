@@ -223,12 +223,8 @@ export async function getResultadosEspeciales() {
 
 // ── RANKING ───────────────────────────────────────────
 export async function getRanking() {
-  // Solo los 15 mejores: evita descargar miles de filas y sobrecargar
-  const { data } = await supabase
-    .from('puntos')
-    .select('*, participantes(nombre)')
-    .order('total', { ascending: false })
-    .limit(15)
+  // Incluye a TODOS los participantes (0 si aún no tienen puntos); ordena y limita en el servidor
+  const { data } = await supabase.rpc('get_ranking', { p_limite: 15 })
   return data || []
 }
 
