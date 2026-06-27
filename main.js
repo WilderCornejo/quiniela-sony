@@ -284,9 +284,11 @@ function renderApp() {
     </nav>
 
     ${!eliminacionBloqueada(fechasGrupos) ? `
-    <div onclick="showPage('especiales')" style="cursor:pointer;max-width:760px;margin:0 auto 6px;padding:12px 16px;border:1px solid rgba(0,229,255,0.4);border-radius:10px;background:linear-gradient(90deg,rgba(0,229,255,0.10),rgba(245,192,78,0.08));display:flex;align-items:center;gap:10px;">
-      <i class="ti ti-star" style="color:#F5C04E;font-size:20px;flex-shrink:0;"></i>
-      <span style="font-size:13px;line-height:1.4;color:var(--text,#eaf6ff);">Recuerda llenar los <strong>Especiales</strong> antes del <strong>viernes 3 de julio a las 11:59 p.m.</strong>: Campeón, Subcampeón y Goleador.</span>
+    <div onclick="showPage('especiales')" class="cinta-aviso" title="Ir a Especiales">
+      <div class="cinta-pista">
+        <span class="cinta-texto">🚨 ¡AMPLIAMOS LA FECHA! &nbsp;Tienes hasta el <strong>VIERNES 3 DE JULIO A LAS 11:59 P.M.</strong> para llenar tus ESPECIALES: Campeón, Subcampeón y Goleador 🏆 &nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <span class="cinta-texto">🚨 ¡AMPLIAMOS LA FECHA! &nbsp;Tienes hasta el <strong>VIERNES 3 DE JULIO A LAS 11:59 P.M.</strong> para llenar tus ESPECIALES: Campeón, Subcampeón y Goleador 🏆 &nbsp;&nbsp;&nbsp;&nbsp;</span>
+      </div>
     </div>` : ''}
 
     <div id="page-grupos" class="page active"></div>
@@ -620,6 +622,46 @@ function inyectarEstilosCuenta() {
       .cr-num { font-size: 30px; }
       .cr-sep { font-size: 22px; padding-bottom: 12px; }
       .cr-lbl { font-size: 9px; }
+    }
+    /* ── Cinta deslizante de aviso (Ampliamos la fecha) ── */
+    .cinta-aviso {
+      cursor: pointer;
+      max-width: 860px;
+      margin: 0 auto 10px;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 2px solid #ff2d2d;
+      background: linear-gradient(90deg, #b00000, #ff1e1e, #b00000);
+      box-shadow: 0 0 18px rgba(255,40,40,0.65);
+      animation: cintaParpadeo 1s steps(1, end) infinite;
+    }
+    .cinta-pista {
+      display: flex;
+      width: max-content;
+      animation: cintaCorre 18s linear infinite;
+    }
+    .cinta-texto {
+      display: inline-block;
+      white-space: nowrap;
+      padding: 11px 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+      letter-spacing: 0.3px;
+    }
+    .cinta-texto strong { color: #ffe14d; }
+    .cinta-aviso:hover .cinta-pista { animation-play-state: paused; }
+    @keyframes cintaCorre {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes cintaParpadeo {
+      0%, 60%  { box-shadow: 0 0 18px rgba(255,40,40,0.65); border-color: #ff2d2d; }
+      61%,100% { box-shadow: 0 0 28px rgba(255,80,80,0.95); border-color: #ffd24d; }
+    }
+    @media (max-width: 480px) {
+      .cinta-texto { font-size: 13px; padding: 9px 0; }
     }
   `
   document.head.appendChild(st)
