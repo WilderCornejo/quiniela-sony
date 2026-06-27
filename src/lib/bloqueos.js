@@ -24,7 +24,7 @@ export function partidoBloqueado(fechaISO, ahora = new Date()) {
 
 // ── FECHA LÍMITE PARA LAS PREDICCIONES ESPECIALES ──
 // (Campeón, Subcampeón y Goleador.) Hora de Costa Rica. Editable aquí en un solo lugar.
-export const CIERRE_ESPECIALES = '2026-06-22T12:00'
+export const CIERRE_ESPECIALES = '2026-07-03T23:59'
 
 // Devuelve la fecha de cierre de Especiales (fija).
 export function fechaCierreEliminacion(fechasGrupos) {

@@ -14,7 +14,7 @@ import { GRUPOS, getPartidosGrupo, KO_ROUNDS, SELECCIONES, GOLEADORES, GOLEADORE
 import { montarBalon3D } from './src/lib/balon3d.js'
 import { montarTrofeo, montarMedalla, montarMiniBalon } from './src/lib/iconos3d.js'
 import { textoSedes } from './src/lib/sedes.js'
-import { partidoBloqueado, eliminacionBloqueada, textoCierre, formatoFechaPartido } from './src/lib/bloqueos.js'
+import { partidoBloqueado, eliminacionBloqueada, textoCierre, formatoFechaPartido, CIERRE_ESPECIALES } from './src/lib/bloqueos.js'
 
 // ═══════════════════════════════════════════════════════
 //  CONFIGURACIÓN DEL GRUPO  (cambiar al clonar la app)
@@ -43,6 +43,7 @@ const banderaDe = (nombre) => flagUrl(NOMBRE_A_CODIGO[nombre] || '')
 
 // ── INIT ──────────────────────────────────────────────
 async function init() {
+  inyectarEstilosCuenta()
   user = getUser()
   inscripcionesAbiertas = (await getConfig('inscripciones_abiertas')) === 'true'
   torneoIniciado = (await getConfig('torneo_iniciado')) === 'true'
@@ -285,7 +286,7 @@ function renderApp() {
     ${!eliminacionBloqueada(fechasGrupos) ? `
     <div onclick="showPage('especiales')" style="cursor:pointer;max-width:760px;margin:0 auto 6px;padding:12px 16px;border:1px solid rgba(0,229,255,0.4);border-radius:10px;background:linear-gradient(90deg,rgba(0,229,255,0.10),rgba(245,192,78,0.08));display:flex;align-items:center;gap:10px;">
       <i class="ti ti-star" style="color:#F5C04E;font-size:20px;flex-shrink:0;"></i>
-      <span style="font-size:13px;line-height:1.4;color:var(--text,#eaf6ff);">Recuerda llenar los <strong>Especiales</strong> antes del <strong>22 de junio a las 12:00</strong>: Campeón, Subcampeón y Goleador.</span>
+      <span style="font-size:13px;line-height:1.4;color:var(--text,#eaf6ff);">Recuerda llenar los <strong>Especiales</strong> antes del <strong>viernes 3 de julio a las 11:59 p.m.</strong>: Campeón, Subcampeón y Goleador.</span>
     </div>` : ''}
 
     <div id="page-grupos" class="page active"></div>
@@ -560,6 +561,102 @@ async function renderEliminacion() {
   }
 }
 
+// ── Estilos de la cuenta regresiva grande (inyectados una sola vez) ──
+function inyectarEstilosCuenta() {
+  if (document.getElementById('css-cuenta-regresiva')) return
+  const st = document.createElement('style')
+  st.id = 'css-cuenta-regresiva'
+  st.textContent = `
+    .cuenta-regresiva {
+      margin: 14px auto 4px;
+      max-width: 560px;
+      text-align: center;
+      background: linear-gradient(135deg, rgba(0,229,255,0.10), rgba(245,192,78,0.10));
+      border: 1px solid rgba(0,229,255,0.45);
+      border-radius: 14px;
+      padding: 16px 12px 18px;
+    }
+    .cr-titulo {
+      font-family: 'Orbitron', monospace;
+      font-size: 14px; letter-spacing: 2px;
+      color: var(--neon, #00e5ff);
+      margin-bottom: 12px; text-transform: uppercase;
+    }
+    .cr-fila {
+      display: flex; align-items: center; justify-content: center;
+      gap: 6px; flex-wrap: nowrap;
+    }
+    .cr-celda {
+      display: flex; flex-direction: column; align-items: center;
+      min-width: 64px;
+      background: rgba(2,8,24,0.55);
+      border: 1px solid rgba(0,229,255,0.30);
+      border-radius: 10px;
+      padding: 10px 6px;
+    }
+    .cr-num {
+      font-family: 'Orbitron', monospace;
+      font-size: 38px; font-weight: 800; line-height: 1;
+      color: #fff;
+      text-shadow: 0 0 14px rgba(0,229,255,0.7);
+    }
+    .cr-lbl {
+      font-size: 10px; letter-spacing: 1.5px;
+      color: var(--text-dim, #8fb3c8);
+      margin-top: 6px;
+    }
+    .cr-sep {
+      font-family: 'Orbitron', monospace;
+      font-size: 30px; font-weight: 800;
+      color: var(--neon, #00e5ff);
+      opacity: 0.7; padding-bottom: 14px;
+    }
+    .cr-cerrado {
+      font-family: 'Orbitron', monospace;
+      font-size: 15px; color: #ff7676; letter-spacing: 1px;
+    }
+    @media (max-width: 480px) {
+      .cr-celda { min-width: 50px; padding: 8px 4px; }
+      .cr-num { font-size: 30px; }
+      .cr-sep { font-size: 22px; padding-bottom: 12px; }
+      .cr-lbl { font-size: 9px; }
+    }
+  `
+  document.head.appendChild(st)
+}
+
+// ── Cuenta regresiva grande para el cierre de Especiales ──
+let _timerEspeciales = null
+function iniciarCuentaEspeciales() {
+  const box = document.getElementById('cuenta-especiales')
+  if (!box) return
+  if (_timerEspeciales) { clearInterval(_timerEspeciales); _timerEspeciales = null }
+
+  // Fecha de cierre en hora de Costa Rica (GMT-6)
+  const cierre = new Date(CIERRE_ESPECIALES + ':00-06:00').getTime()
+
+  function pintar() {
+    const falta = cierre - Date.now()
+    if (falta <= 0) {
+      box.innerHTML = '<div class="cr-cerrado">⏳ Tiempo agotado — las Especiales se cerraron</div>'
+      clearInterval(_timerEspeciales); _timerEspeciales = null
+      return
+    }
+    const d = Math.floor(falta / 86400000)
+    const h = Math.floor((falta % 86400000) / 3600000)
+    const min = Math.floor((falta % 3600000) / 60000)
+    const seg = Math.floor((falta % 60000) / 1000)
+    const celda = (n, lbl) => `<div class="cr-celda"><span class="cr-num">${String(n).padStart(2,'0')}</span><span class="cr-lbl">${lbl}</span></div>`
+    box.innerHTML = `
+      <div class="cr-titulo">⏰ Cierra en</div>
+      <div class="cr-fila">
+        ${celda(d,'DÍAS')}<span class="cr-sep">:</span>${celda(h,'HORAS')}<span class="cr-sep">:</span>${celda(min,'MIN')}<span class="cr-sep">:</span>${celda(seg,'SEG')}
+      </div>`
+  }
+  pintar()
+  _timerEspeciales = setInterval(pintar, 1000)
+}
+
 // ── ESPECIALES ────────────────────────────────────────
 function renderEspeciales() {
   const cont = document.getElementById('page-especiales')
@@ -584,12 +681,13 @@ function renderEspeciales() {
       ${bloqueado
         ? `<div class="aviso-bloqueo">
              <i class="ti ti-lock"></i>
-             Esta fase ya está cerrada. El plazo venció el 22 de junio a las 12:00.
+             Esta fase ya está cerrada. El plazo venció el viernes 3 de julio a las 11:59 p.m.
            </div>`
         : `<div class="aviso-cierre">
              <i class="ti ti-clock"></i>
              Puedes llenar esta fase hasta: <strong>${textoCierre(fechasGrupos)}</strong>
-           </div>`}
+           </div>
+           <div id="cuenta-especiales" class="cuenta-regresiva"></div>`}
       <div class="pts-grid" style="margin-bottom:0;margin-top:12px;">
         <div class="pts-item"><span class="pts-val">10</span><div class="pts-desc">Campeón correcto</div></div>
         <div class="pts-item"><span class="pts-val">5</span><div class="pts-desc">Subcampeón correcto</div></div>
@@ -643,6 +741,8 @@ function renderEspeciales() {
       saveEsp('goleador', val)
     }
   }
+
+  iniciarCuentaEspeciales()
 
   const espPending = { ...especiales }
 
