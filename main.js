@@ -827,7 +827,6 @@ async function renderRanking() {
         <p style="font-size:14px;color:var(--text-dim);margin:-4px 0 14px;"><i class="ti ti-info-circle"></i> Se muestran los 15 mejores rankeados.</p>
         <table class="rank-table">
           <thead><tr>
-            <th>#</th>
             <th>Participante</th>
             <th>Grupos</th>
             <th>KO</th>
@@ -837,11 +836,10 @@ async function renderRanking() {
           <tbody>
             ${ranking.map((r, i) => {
               const pos = i + 1
-              const cls = pos === 1 ? 'gold' : pos === 2 ? 'silver' : pos === 3 ? 'bronze' : ''
-              const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos
+              const colorTop = pos === 1 ? '#FFD700' : pos === 2 ? '#C0C0C0' : pos === 3 ? '#CD7F32' : ''
+              const nameStyle = colorTop ? `font-weight:700;font-size:14px;color:${colorTop};` : 'font-weight:600;font-size:14px;'
               return `<tr class="rank-row">
-                <td><span class="rank-pos ${cls}">${medal}</span></td>
-                <td style="font-weight:600;font-size:15px;">${r.nombre || '—'}</td>
+                <td style="${nameStyle}">${r.nombre || '—'}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_grupos}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_ko}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_especiales}</td>
