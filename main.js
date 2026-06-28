@@ -829,9 +829,9 @@ async function renderRanking() {
           <thead><tr>
             <th>Participante</th>
             <th>Grupos</th>
-            <th>KO</th>
-            <th>Especiales</th>
             <th>Total</th>
+            <th>Especiales</th>
+            <th>KO</th>
           </tr></thead>
           <tbody>
             ${ranking.map((r, i) => {
@@ -841,9 +841,9 @@ async function renderRanking() {
               return `<tr class="rank-row">
                 <td style="${nameStyle}">${r.nombre || '—'}</td>
                 <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_grupos}</td>
-                <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_ko}</td>
-                <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_especiales}</td>
                 <td><span class="rank-pts">${r.total}</span></td>
+                <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_especiales}</td>
+                <td style="font-family:'Orbitron',monospace;font-size:13px;color:var(--text-dim);">${r.pts_ko}</td>
               </tr>`
             }).join('')}
           </tbody>
